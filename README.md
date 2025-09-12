@@ -46,7 +46,7 @@ gradio/
 
 2. 安装基础依赖：
    ```bash
-    conda env create -f environment_linux.yml/environment_win.yml
+    conda env create -f environment_win.yml
    ```
 3. 安装paddle相关依赖
     ```bash

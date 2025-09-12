@@ -2,11 +2,17 @@ import gradio as gr
 import time
 import os
 import pandas as pd
-from paddlex import create_model
+# 尝试导入paddle相关模块，如果失败则设置标志
+try:
+    from paddlex import create_model
+    paddle_available = True
+except ImportError:
+    paddle_available = False
 import matplotlib.pyplot as plt
 from io import BytesIO, StringIO
 from PIL import Image
 import sys
+import gradio as gr
 
 # 设置中文字体支持，确保负号能够正确显示
 plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正确显示负号的字体
@@ -52,7 +58,27 @@ def process_input(selected_model_dir):
     # 检查是否选择了测试文件
     if not selected_preset:
         return None, f"错误: 请先选择一个测试文件\n{preset_info}\n{model_info}"
-    else:
+    
+    # 检查paddle相关模块是否可用
+    if not paddle_available:
+        data = pd.read_csv(selected_preset)
+        plot_title = f"时序曲线 - {os.path.basename(selected_preset)}"
+        plot_img = plot_time_series(data, plot_title)
+        
+        # 提供友好的错误提示
+        error_msg = ("错误: 缺少必要的PaddlePaddle相关依赖!\n" 
+                    "请按照以下步骤安装所需依赖:\n" 
+                    "1. 打开environment_win.yml文件\n" 
+                    "2. 移除以下三行前面的注释符号(#):\n" 
+                    "   - paddlepaddle-gpu==3.0.0\n" 
+                    "   - paddlets==1.1.0\n" 
+                    "   - paddlex==3.0.2\n" 
+                    "3. 运行命令: conda env update -f environment_win.yml\n" 
+                    "4. 重新启动应用程序\n\n" 
+                    f"{preset_info}\n{model_info}")
+        return plot_img, error_msg
+    
+    try:
         data = pd.read_csv(selected_preset)
         # 绘制时序曲线图
         plot_title = f"时序曲线 - {os.path.basename(selected_preset)}"
@@ -92,6 +118,12 @@ def process_input(selected_model_dir):
         else:
             result_str = "未获取到有效预测结果"
         return plot_img, f"处理完成!\n{preset_info}\n{model_info}\n\n{result_str}"
+    except Exception as e:
+        # 处理其他可能的异常
+        data = pd.read_csv(selected_preset)
+        plot_title = f"时序曲线 - {os.path.basename(selected_preset)}"
+        plot_img = plot_time_series(data, plot_title)
+        return plot_img, f"处理过程中发生错误: {str(e)}\n{preset_info}\n{model_info}"
 
 
 def set_selected(file_path, buttons, file_paths):
@@ -198,7 +230,7 @@ def create_interface():
                 plot_output = gr.Image(label="数据曲线", type="pil")
 
                 gr.Markdown("### 处理结果")
-                output_text = gr.Textbox(label="预测结果", lines=6)
+                output_text = gr.Textbox(label="结果信息", lines=10, interactive=False)
 
         # 处理按钮事件（返回图片和文本结果）
         process_btn.click(
