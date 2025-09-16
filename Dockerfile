@@ -18,6 +18,7 @@ RUN apt-get update && \
         libxrender1 \
         libxext6 \
         git \
+        tmux \
     && ln -s /usr/bin/python3.10 /usr/bin/python \
     && rm -rf /var/lib/apt/lists/*
 
@@ -49,5 +50,5 @@ RUN paddlex --install PaddleTS
 
 WORKDIR /app
 
-EXPOSE 35700-37700
+EXPOSE 37700-37900
 CMD ["bash", "-c", "tail -f /dev/null"]
