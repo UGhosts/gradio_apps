@@ -25,4 +25,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ secrets.DOCKER_HUB_REGISTER }}/ughost-docker/gradio_apps:v1.0.1
+        tags: ${{ secrets.DOCKER_HUB_REGISTER }}/ughost-docker/gradio_apps:v1.0.2

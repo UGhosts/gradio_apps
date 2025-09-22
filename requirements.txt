@@ -10,3 +10,4 @@ python-dotenv
 requests
 huggingface_hub
 opencv-python-headless>=4.5.0
+watchdog
