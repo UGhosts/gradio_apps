@@ -45,8 +45,10 @@ RUN git clone https://github.com/PaddlePaddle/PaddleX.git
 WORKDIR /app/PaddleX
 
 RUN pip install -e ".[base]"
+RUN pip install -e ".[ocr]"
 
 RUN paddlex --install PaddleTS
+RUN paddlex --install PaddleOCR
 
 WORKDIR /app
 
