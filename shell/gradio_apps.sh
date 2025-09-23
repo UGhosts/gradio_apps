@@ -1,18 +1,42 @@
 #!/bin/bash
 
-# 定义你的Python应用文件名
-APP_FILE="${1:-apps/main.py}"
-# 定义端口，默认为7860
-PORT="${2:-7860}"
-# 定义重启信号文件名，必须和Python脚本中的一致
+# 定义默认值
+APP_FILE="/home/software/gradio_apps/main.py"
+APP=""
+PORT=""
 RESTART_SIGNAL_FILE=".restart_signal"
+
+# 解析命令行参数
+while getopts ":f:a:p:" opt; do
+  case $opt in
+    f) APP_FILE="$OPTARG"
+    ;;
+    a) APP="$OPTARG"
+    ;;
+    p) PORT="$OPTARG"
+    ;;
+    \?) echo "无效的选项 -$OPTARG" >&2
+    ;;
+  esac
+done
+shift $((OPTIND-1))
+
+# 检查APP是否已设置
+if [ -z "$APP" ]; then
+    echo "错误：必须指定应用名。请使用 -a <应用名> 参数。"
+    exit 1
+fi
 
 # 启动一个无限循环
 while true; do
     echo "========= 正在启动 Gradio 应用... ========="
     
     # 运行你的Python应用
-    /nfs/miniconda3/envs/gradio/bin/python "$APP_FILE" --port "$PORT"
+    if [ -n "$PORT" ]; then
+        /nfs/miniconda3/envs/gradio/bin/python "$APP_FILE" "$APP" "$PORT"
+    else
+        /nfs/miniconda3/envs/gradio/bin/python "$APP_FILE" "$APP"
+    fi
     
     # Python应用退出后，检查是否存在重启信号文件
     if [ -f "$RESTART_SIGNAL_FILE" ]; then
