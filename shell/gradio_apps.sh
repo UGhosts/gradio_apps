@@ -4,7 +4,7 @@
 APP_FILE="/home/software/gradio_apps/main.py"
 APP=""
 PORT=""
-RESTART_SIGNAL_FILE=".restart_signal"
+# RESTART_SIGNAL_FILE=".restart_signal"
 
 # 解析命令行参数
 while getopts ":f:a:p:" opt; do
@@ -19,8 +19,9 @@ while getopts ":f:a:p:" opt; do
     ;;
   esac
 done
-shift $((OPTIND-1))
 
+shift $((OPTIND-1))
+RESTART_SIGNAL_FILE=".restart_signal_${APP}"
 # 检查APP是否已设置
 if [ -z "$APP" ]; then
     echo "错误：必须指定应用名。请使用 -a <应用名> 参数。"
@@ -30,7 +31,6 @@ fi
 # 启动一个无限循环
 while true; do
     echo "========= 正在启动 Gradio 应用... ========="
-    
     # 运行你的Python应用
     if [ -n "$PORT" ]; then
         /nfs/miniconda3/envs/gradio/bin/python "$APP_FILE" "$APP" "$PORT"

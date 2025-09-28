@@ -49,6 +49,10 @@ RUN pip install -e ".[ocr]"
 
 RUN paddlex --install PaddleTS
 RUN paddlex --install PaddleOCR
+RUN paddlex --install PaddleDetection
+RUN paddlex --install PaddleSeg
+
+
 
 WORKDIR /app
 

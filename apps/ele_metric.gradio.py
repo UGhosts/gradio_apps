@@ -7,144 +7,56 @@ from PIL import Image, ImageDraw, ImageFont
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import json
-
+from utils.app_utils import AppUtils as util
+from utils.app_utils import MultiDirectoryMonitor
+from pathlib import Path
 # --- 全局OCR实例 ---
 ocr_instance = None
 
 # --- 模型目录配置 ---
-MODEL_BASE_DIR = "/home/software/gradio_apps/model/ele_metric_ocr"
-
-def generate_paddlex_model_options(base_dir: str) -> dict:
-    """
-    动态扫描指定目录，自动生成PaddleX的模型配置字典。
-    支持：
-      - 完整自定义模型（det + rec）
-      - 仅自定义检测模型 + 默认识别模型
-      - PaddleX预训练模型
-    """
-    if not os.path.isdir(base_dir):
-        print(f"警告: 模型根目录 '{base_dir}' 不存在。将返回空配置。")
-        return {}
-    
-    # model_collection = {"display_name":MODEL_BASE_DIR.split('/')[-1]}
-    model_collection = {}
-    
-
-    for file in os.listdir(base_dir):
-        if file.endswith('.yaml'):
-            model_name = file.split('.')[0]
-            model_collection[model_name] = os.path.join(base_dir, file)
-    
-    return model_collection
-
-# 动态生成模型选项
-MODEL_OPTIONS = generate_paddlex_model_options(MODEL_BASE_DIR)
-
-EXAMPLE_IMAGES_DIR = "/home/software/gradio_apps/dataset/ele_metric_ocr"
+MODEL_BASE_DIR = "/home/software/gradio_apps/model/ele_metric_ocr/model"
+RESTART_SIGNAL_FILENAME=".restart_signal_ele_metric"
+EXAMPLE_DIR = "/home/software/gradio_apps/model/ele_metric_ocr/example"
 EXAMPLE_IMAGES = []
 
-def load_example_images():
-    """加载示例图片列表"""
-    global EXAMPLE_IMAGES
-    EXAMPLE_IMAGES = []
-    if os.path.exists(EXAMPLE_IMAGES_DIR):
-        for filename in sorted(os.listdir(EXAMPLE_IMAGES_DIR)):
-            if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-                EXAMPLE_IMAGES.append(os.path.join(EXAMPLE_IMAGES_DIR, filename))
 
-# 初始加载
-load_example_images()
+model_options = util.generate_paddlex_model_options(MODEL_BASE_DIR)
+
 
 # --- 重启信号和文件监控处理 ---
-RESTART_SIGNAL_FILE = ".restart_signal"
 
-def trigger_restart():
-    """创建重启信号文件并终止当前应用进程。"""
-    print("检测到文件变化，正在触发应用重启...")
-    with open(RESTART_SIGNAL_FILE, "w") as f:
-        f.write("restart")
-    
-    monitor_manager.stop_all(join_threads=False)
-    print("应用进程即将退出...")
-    os._exit(0)
-
-class DirectoryHandler(FileSystemEventHandler):
-    def __init__(self):
-        super().__init__()
-    
-    def on_created(self, event):
-        trigger_restart()
-    
-    def on_deleted(self, event):
-        trigger_restart()
-    
-    def on_moved(self, event):
-        trigger_restart()
-
-class MultiDirectoryMonitor:
-    """一个可以管理多个目录监控任务的类。"""
-    def __init__(self):
-        self._directories_to_watch = set()
-        self._observers = []
-
-    def add_directory(self, path: str):
-        """注册一个需要被监控的目录路径。"""
-        if os.path.abspath(path) not in self._directories_to_watch:
-            self._directories_to_watch.add(os.path.abspath(path))
-            print(f"目录已注册监控: {path}")
-
-    def start_all(self):
-        """为所有已注册的目录启动监控。"""
-        if self._observers:
-            print("监控已经在运行中。")
-            return
-
-        handler = DirectoryHandler()
-        for path in self._directories_to_watch:
-            os.makedirs(path, exist_ok=True)
-            observer = Observer()
-            observer.schedule(handler, path, recursive=True)
-            self._observers.append(observer)
-        
-        for observer in self._observers:
-            observer.start()
-            
-        print(f"✅ 已启动对 {len(self._observers)} 个目录的监控。")
-
-    def stop_all(self, join_threads: bool = True):
-        """停止所有监控任务。"""
-        for observer in self._observers:
-            if observer.is_alive():
-                observer.stop()
-
-        if join_threads:
-            for observer in self._observers:
-                observer.join()
-        
-        self._observers = []
-        print("✅ 所有监控任务已停止。")
-
-# 创建全局管理器实例
-monitor_manager = MultiDirectoryMonitor()
-
-def get_current_examples():
-    """获取当前示例图片列表（格式化为Gallery需要的格式）"""
-    examples = []
-    if EXAMPLE_IMAGES:
-        for example_path in EXAMPLE_IMAGES:
-            examples.append([example_path, ""])
-    return examples
 
 def initialize_ocr(model_choice):
     """根据用户选择初始化PaddleX OCR模型"""
     global ocr_instance
     try:
-        models_config = MODEL_OPTIONS[model_choice]
-        ocr_instance = pdx.create_pipeline(models_config)
+        print(model_options)
+        models_config = model_options[model_choice]
         
-    except Exception as e:
-        error_msg = f"✗ 初始化模型失败: {str(e)}"
-        return error_msg
+        # 第一次尝试初始化（如果失败会直接进入except）
+        ocr_instance = pdx.create_pipeline(models_config)
+        return "✓ 模型初始化成功"
+        
+    except Exception as first_error:
+        # 如果第一次初始化失败，尝试从配置文件的同级目录加载.yaml文件
+        try:
+            current_path = Path(models_config).parent.parent / "pipeline"
+            yaml_files = [file for file in current_path.iterdir() if file.suffix == ".yaml"]
+            
+            if not yaml_files:
+                raise Exception("未找到可用的.yaml配置文件")
+                
+            # 尝试加载第一个.yaml文件（如果失败会抛出异常）
+            ocr_instance = pdx.create_pipeline(str(yaml_files[0]))  # 确保传入字符串路径
+            return "✓ 从备用.yaml文件初始化成功"
+            
+        except Exception as fallback_error:
+            error_msg = (
+                f"✗ 初始化模型失败:\n"
+                f"- 主配置失败: {str(first_error)}\n"
+                f"- 备用.yaml文件失败: {str(fallback_error)}"
+            )
+            return error_msg
 
 
 MAX_OCR_IMAGE_SIZE = 1280 
@@ -392,139 +304,136 @@ def refresh_examples():
         status_msg = "*没有找到示例图片，请在 ./examples/ 目录下添加图片文件*"
     return examples, status_msg
 
-# health check
-health_check_js = '''
-() => {
-    let isConnected = true;
-    setInterval(async () => {
-        try {
-            await fetch('/app_id');
-            if (!isConnected) {
-                console.log("成功重新连接到服务器，正在刷新页面...");
-                location.reload();
+def create_gradio_interface():
+    health_check_js = '''
+    () => {
+        let isConnected = true;
+        setInterval(async () => {
+            try {
+                await fetch('/');
+                if (!isConnected) {
+                    console.log("成功重新连接到服务器，正在刷新页面...");
+                    location.reload();
+                }
+                isConnected = true;
+            } catch (e) {
+                if (isConnected) {
+                    console.log("与服务器的连接已断开，等待重新连接...");
+                }
+                isConnected = false;
             }
-            isConnected = true;
-        } catch (e) {
-            if (isConnected) {
-                console.log("与服务器的连接已断开，等待重新连接...");
-            }
-            isConnected = false;
-        }
-    }, 2000);
-}
-'''
+        }, 2000);
+    }
+    '''
 
-# --- 创建 Gradio 界面 ---
-with gr.Blocks(title="PaddleX 智能文字识别", theme=gr.themes.Default(), js=health_check_js) as iface:
-    gr.Markdown("""
-    # 🔍 电表读数OCR
-    **功能特点：** 基于PaddleX框架的OCR识别、支持多种模型选择、提供示例图片、实时可视化识别结果
-    """)
-    
-    with gr.Row():
-        # 左侧：示例图片和模型选择
-        with gr.Column(scale=1):
-            gr.Markdown("### 🖼️ 示例图片")
-            with gr.Row():
-                gr.Markdown("点击下方示例图片快速体验识别效果：")
-            
-            initial_examples = get_current_examples()
-
-            example_gallery = gr.Gallery(
-                value=initial_examples,
-                label="点击选择示例",
-                show_label=False,
-                elem_id="example_gallery",
-                columns=4,
-                rows=1,
-                height=200,
-                allow_preview=False
-            )
+    # --- 创建 Gradio 界面 ---
+    with gr.Blocks(title="PaddleX 智能文字识别", theme=gr.themes.Default(), js=health_check_js) as iface:
+        gr.Markdown("""
+        # 🔍 电表读数OCR
+        **功能特点：** 基于PaddleX框架的OCR识别、支持多种模型选择、提供示例图片、实时可视化识别结果
+        """)
+        
+        with gr.Row():
+            # 左侧：示例图片和模型选择
+            with gr.Column(scale=1):
+                gr.Markdown("### 🖼️ 示例图片")
+                with gr.Row():
+                    gr.Markdown("点击下方示例图片快速体验识别效果：")
                 
-            gr.Markdown("### 🤖 模型选择")
-            model_selector = gr.Dropdown(
-                choices=list(MODEL_OPTIONS.keys()),
-                value=list(MODEL_OPTIONS.keys())[0] if MODEL_OPTIONS else None,
-                label="选择OCR模型",
-                info="支持PaddleX预训练模型和自定义模型"
-            )
 
-            with gr.Accordion("📖 使用说明", open=True):
-                gr.Markdown("""
-                **操作步骤：**
-                1. 选择合适的OCR模型
-                2. 上传图片或选择示例图片
-                3. 点击"开始识别"按钮
-                4. 查看识别结果和可视化标注
+                example_gallery = gr.Gallery(
+                    value=util.get_current_examples(EXAMPLE_DIR),
+                    label="点击选择示例",
+                    show_label=False,
+                    elem_id="example_gallery",
+                    columns=4,
+                    rows=1,
+                    height=200,
+                    allow_preview=False
+                )
+                    
+                gr.Markdown("### 🤖 模型选择")
+                model_selector = gr.Dropdown(
+                        choices=list(model_options.keys()),
+                        value=list(model_options.keys())[0] if model_options else None,
+                    label="选择OCR模型",
+                    info="支持PaddleX预训练模型和自定义模型"
+                )
+
+                with gr.Accordion("📖 使用说明", open=True):
+                    gr.Markdown("""
+                    **操作步骤：**
+                    1. 选择合适的OCR模型
+                    2. 上传图片或选择示例图片
+                    3. 点击"开始识别"按钮
+                    4. 查看识别结果和可视化标注
+                    
+                    **支持格式：** JPG, PNG, JPEG
+                    
+                    **基于框架：** PaddleX
+                    """)
                 
-                **支持格式：** JPG, PNG, JPEG
+            # 右侧：上传和结果
+            with gr.Column(scale=1):
+                gr.Markdown("### 📤 上传图片")
+                input_image = gr.Image(
+                    type="filepath", 
+                    label="上传图片",
+                    height=200,
+                    sources=['upload']
+                )
+                
+                with gr.Row():
+                    submit_btn = gr.Button("🚀 开始识别", variant="primary", size="lg")
+                    clear_btn = gr.Button("🗑️ 清空", variant="secondary")
+                
+                gr.Markdown("### 📋 识别结果")
+                output_image = gr.Image(label="识别结果可视化", height=600)
+                result_status = gr.Textbox(label="识别结果", interactive=False)
 
-                **基于框架：** PaddleX
-                """)
-            
-        # 右侧：上传和结果
-        with gr.Column(scale=1):
-            gr.Markdown("### 📤 上传图片")
-            input_image = gr.Image(
-                type="filepath", 
-                label="上传图片",
-                height=200,
-                sources=['upload']
-            )
-            
-            with gr.Row():
-                submit_btn = gr.Button("🚀 开始识别", variant="primary", size="lg")
-                clear_btn = gr.Button("🗑️ 清空", variant="secondary")
-            
-            gr.Markdown("### 📋 识别结果")
-            output_image = gr.Image(label="识别结果可视化", height=600)
-            result_status = gr.Textbox(label="识别结果", interactive=False)
+        # 事件绑定
+        def select_example(evt: gr.SelectData):
+            current_examples = util.get_current_examples(EXAMPLE_DIR)
+            if current_examples and evt.index < len(current_examples):
+                selected_path = current_examples[evt.index]
+                return selected_path
+            return None
 
-    # 事件绑定
-    def select_example(evt: gr.SelectData):
-        current_examples = get_current_examples()
-        if current_examples and evt.index < len(current_examples):
-            selected_path = current_examples[evt.index][0]
-            return selected_path
-        return None
-
-    example_gallery.select(select_example, None, outputs=[input_image])
-    
-    submit_btn.click(
-        fn=ocr_image,
-        inputs=[input_image, model_selector],
-        outputs=[output_image, result_status]
-    )
-    
-    clear_btn.click(
-        fn=clear_outputs,
-        outputs=[input_image, output_image, result_status]
-    )
-    
-    model_selector.change(
-        fn=change_model,
-        inputs=[model_selector]
-    )
-
+        example_gallery.select(select_example, None, outputs=[input_image])
+        
+        submit_btn.click(
+            fn=ocr_image,
+            inputs=[input_image, model_selector],
+            outputs=[output_image, result_status]
+        )
+        
+        clear_btn.click(
+            fn=clear_outputs,
+            outputs=[input_image, output_image, result_status]
+        )
+        
+        model_selector.change(
+            fn=change_model,
+            inputs=[model_selector]
+        )
+        return iface
 def main():
-    # 确保示例目录存在
-    os.makedirs(EXAMPLE_IMAGES_DIR, exist_ok=True)
-    
-    # 启动目录监控
-    monitor_manager.add_directory(EXAMPLE_IMAGES_DIR)
+    monitor_manager = MultiDirectoryMonitor(restart_signal_file_name=RESTART_SIGNAL_FILENAME)
     monitor_manager.add_directory(MODEL_BASE_DIR)
-    monitor_manager.start_all()
-    
+    monitor_manager.add_directory(EXAMPLE_DIR)
+    if not monitor_manager.start_all():
+        print("❌ 启动目录监控失败")
+        return
     port = 7861
     if len(sys.argv) > 1:
         try:
             port = int(sys.argv[1])
             if port < 1024 or port > 65535:
-                print(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口7861")
-                port = 7861
+                print(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口{port}")
+                port = port
         except ValueError:
-            print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7861")
-    
+            print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口{port}")
+    iface = create_gradio_interface()
     try:
         iface.launch(
             server_name="0.0.0.0",
