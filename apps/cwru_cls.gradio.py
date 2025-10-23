@@ -3,13 +3,12 @@ import time
 import os
 import pandas as pd
 from paddlex import create_model
-import matplotlib.pyplot as plt
 from io import BytesIO, StringIO
 from PIL import Image
 import sys
-
+from utils.app_utils import AppUtils as util
 # 设置中文字体支持，确保负号能够正确显示
-plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正确显示负号的字体
+plt = util.auto_config_chinese_font()
 # 全局变量记录选中的测试文件
 selected_preset = None
 

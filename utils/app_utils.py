@@ -2,6 +2,9 @@ import os
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import logging
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -33,6 +36,41 @@ class AppUtils:
             logger.error(f"读取模型目录时出错: {e}")
             
         return model_collection
+
+    @staticmethod
+    def auto_config_chinese_font():
+        """
+        自动扫描系统中的字体，找到可用的中文字体并进行配置。
+        如果找不到，则会提示。
+        """
+        font_keywords = [
+            'Heiti', 'SimHei', 'FangSong', 'KaiTi', 'Lantinghei', '儷黑',
+            'Microsoft YaHei', 'Microsoft JhengHei',
+            'Noto Sans CJK', 'Source Han Sans', 'WenQuanYi', 'wqy-zenhei'
+        ]
+
+        font_paths = fm.findSystemFonts()
+        target_font_path = None
+        for keyword in font_keywords:
+            for font_path in font_paths:
+                if keyword.lower() in os.path.basename(font_path).lower():
+                    target_font_path = font_path
+                    break
+            if target_font_path:
+                break
+        if target_font_path:
+            try:
+                font_prop = fm.FontProperties(fname=target_font_path)
+                font_name = font_prop.get_name()
+                plt.rcParams['font.family'] = 'sans-serif'
+                plt.rcParams['font.sans-serif'] = [font_name]
+                plt.rcParams['axes.unicode_minus'] = False
+                return plt
+                
+            except Exception as e:
+                print(f"配置字体时出错: {e}")
+                print("无法自动配置中文字体。")
+                
 
 
 class DirectoryHandler(FileSystemEventHandler):
