@@ -30,9 +30,10 @@ def process_input(selected_model_dir):
 
         selected_model_dir=selected_model_dir.replace('\\','/')
         from paddlex import create_model
+
         model = create_model(model_name="PP-LCNet_x1_0", model_dir=selected_model_dir)
         output = model.predict(filepath, batch_size=1)
-        savepath="./output/dianji_class" # 结果目录
+        savepath="./output/dianji_cls" # 结果目录
         for res in output:
             res.print()  ## 打印预测的结构化输出
             res.save_to_img(save_path=savepath)  ## 保存结果可视化图像
@@ -70,7 +71,7 @@ def set_selected(file_path, buttons, file_paths):
 
 def create_interface():
     # 从dataset/目录动态读取CSV文件
-    cwru_dir = os.path.join(os.path.dirname(__file__), "dataset", "dianji_class")
+    cwru_dir = os.path.join(os.path.dirname(__file__), "dataset", "dianji_cls")
     preset_files = {}
 
     # 确保使用绝对路径或者正确的相对路径
@@ -78,9 +79,9 @@ def create_interface():
         # 尝试使用其他可能的路径
         alt_paths = [
             "E:/ai-dataset/motor_fault_detect_/validation/positive_samples",
-            #"../dataset/dianji_class",
-            "./dataset/dianji_class",
-            "dataset/dianji_class",
+            #"../dataset/dianji_cls",
+            "./dataset/dianji_cls",
+            "dataset/dianji_cls",
         ]
         for path in alt_paths:
             if os.path.exists(path):
@@ -96,7 +97,7 @@ def create_interface():
 
     # 如果没有找到文件，使用默认文件
     if not preset_files:
-        preset_files = {"dataset/dianji_class/t_n1.csv": "📄 t_n1.csv"}
+        preset_files = {"dataset/dianji_cls/t_n1.csv": "📄 t_n1.csv"}
 
     # 从model/dianji_model目录读取子目录作为模型选项
     model_dir = os.path.join(os.path.dirname(__file__), "model", "dianji_model")
