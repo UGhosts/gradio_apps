@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# 获取脚本所在目录的绝对路径
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 获取项目根目录（脚本所在目录的上一级）
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -7,15 +13,15 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# 日志目录
-LOG_DIR="/app/logs"
+# 日志目录（基于项目根目录）
+LOG_DIR="${PROJECT_ROOT}/logs"
 mkdir -p "$LOG_DIR"
 
-# 应用配置文件路径
-APP_FILE="/app/main.py"
+# 应用配置文件路径（基于项目根目录）
+APP_FILE="${PROJECT_ROOT}/main.py"
 
-# 单个应用启动脚本路径
-WRAPPER_SCRIPT="/app/start_app.sh"
+# 单个应用启动脚本路径（在当前 shell 目录）
+WRAPPER_SCRIPT="${SCRIPT_DIR}/start_app.sh"
 
 # 定义要启动的应用列表（格式：应用名:端口）
 # 如果不需要指定端口，只写应用名即可
@@ -134,6 +140,8 @@ main() {
         else
             ((fail_count++))
         fi
+        
+        # 稍微间隔一下，避免同时启动太多进程
         sleep 1
     done
     

@@ -57,15 +57,16 @@ RUN uv pip install --system --no-cache -r requirements.txt
 RUN uv pip install --system --no-cache paddlepaddle-gpu==3.0.0 \
     --index-url https://www.paddlepaddle.org.cn/packages/stable/cu118/
 
+RUN uv pip install --system langchain==0.3.27
 # 安装 PaddleX
 RUN git clone https://github.com/PaddlePaddle/PaddleX.git /tmp/PaddleX && \
     cd /tmp/PaddleX && \
     uv pip install --system --no-cache -e ".[base]" && \
     uv pip install --system --no-cache -e ".[ocr]" && \
-    paddlex --install PaddleTS && \
-    paddlex --install PaddleOCR && \
-    paddlex --install PaddleDetection && \
-    paddlex --install PaddleSeg && \
+    uv run paddlex --install PaddleTS && \
+    uv run paddlex --install PaddleOCR && \
+    uv run paddlex --install PaddleDetection && \
+    uv run paddlex --install PaddleSeg && \
     # 清理不必要的文件
     rm -rf .git .github tests docs examples && \
     cd /app
@@ -80,6 +81,9 @@ COPY doc/ ./doc/
 COPY model/ ./model/
 COPY shell/ ./shell/
 
+RUN chmod +x /app/shell/start_all_apps.sh /app/shell/start_app.sh
+RUN mkdir -p /app/logs
+
 # 暴露端口并设置默认命令
 EXPOSE 37700-37900
-CMD ["bash", "-c", "tail -f /dev/null"]
+CMD ["bash", "/app/start_all_apps.sh"]
