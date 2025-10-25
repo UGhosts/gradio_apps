@@ -33,9 +33,9 @@ while true; do
     echo "========= 正在启动 Gradio 应用... ========="
     # 运行你的Python应用
     if [ -n "$PORT" ]; then
-        /nfs/miniconda3/envs/gradio/bin/python "$APP_FILE" "$APP" "$PORT"
+        python "$APP_FILE" "$APP" "$PORT"
     else
-        /nfs/miniconda3/envs/gradio/bin/python "$APP_FILE" "$APP"
+        python "$APP_FILE" "$APP"
     fi
     
     # Python应用退出后，检查是否存在重启信号文件

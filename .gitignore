@@ -96,4 +96,5 @@ PaddleOCR/*
 dataset/*
 model/*/output/*
 model/*/dataset/*
+model/*/train_dataset/*
 /temp/*

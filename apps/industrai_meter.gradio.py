@@ -31,9 +31,15 @@ METER_CONFIG = [{
     'range': 1.6,
     'unit': "(MPa)"
 }]
-EXAMPLE_DIR = "/home/software/gradio_apps/model/industrail_metric_det/example"
-MODEL_BASE_DIR = "/home/software/gradio_apps/model/industrail_metric_det/model"
-RESTART_SIGNAL_FILENAME=".restart_signal_industrai_meter"
+
+from pathlib import Path
+
+# --- 模型目录配置 ---
+BASE_DIR = Path(__file__).parent.parent
+MODEL_BASE_DIR = BASE_DIR / "model" / "industrail_metric_det" / "model"
+RESTART_SIGNAL_FILENAME = ".restart_signal_industrai_meter"
+EXAMPLE_DIR = BASE_DIR / "model" / "industrail_metric_det" / "example"
+
 
 class MeterReader:
     def __init__(self, detector_dir, segmenter_dir):

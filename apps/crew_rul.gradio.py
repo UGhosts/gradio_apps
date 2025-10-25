@@ -17,6 +17,7 @@ from PIL import Image
 import matplotlib
 from utils.app_utils import AppUtils as util
 from matplotlib.patches import Rectangle, FancyBboxPatch
+from pathlib import Path
 matplotlib.use('Agg')
 
 # 全局变量
@@ -30,24 +31,30 @@ plt = util.auto_config_chinese_font()
 model_cache = {}
 scaler_cache = {}
 
+
+
+
 class Config:
-    SAVE_DIR = '/home/software/gradio_apps/model/crew_rul/model'
-    EXAMPLE_DIR = "/home/software/gradio_apps/model/crew_rul/dataset"
-    RESTART_SIGNAL_FILENAME=".restart_signal_crew_rul"
+
     WINDOW_SIZE = 25
     FS = 25600
     RUL_CAP = 150.0
     
     def __init__(self, model_version=4400):
         self.MODEL_VERSION = model_version
+        self.BASE_DIR = Path(__file__).parent.parent
+        self.MODEL_BASE_DIR = self.BASE_DIR / "model" / "crew_rul" / "model"
+        self.RESTART_SIGNAL_FILENAME = ".restart_signal_crew_rul"
+        self.EXAMPLE_DIR = self.BASE_DIR / "model" / "crew_rul" / "dataset"
 
     @property
     def MODEL_PATH(self):
-        return f'{self.SAVE_DIR}/rul_model_v{self.MODEL_VERSION}.h5'
+        print(self.MODEL_BASE_DIR)
+        return self.MODEL_BASE_DIR / f"rul_model_v{self.MODEL_VERSION}.h5"
 
     @property
     def SCALER_PATH(self):
-        return f'{self.SAVE_DIR}/scalers_v{self.MODEL_VERSION}.pkl'
+        return self.MODEL_BASE_DIR / f"scalers_v{self.MODEL_VERSION}.pkl"
 
 class TemporalAttention(Layer):
     """时序注意力机制"""
@@ -78,7 +85,7 @@ class TemporalAttention(Layer):
     def compute_output_shape(self, input_shape):
         return (input_shape[0], input_shape[-1])
 
-model_options = util.generate_paddlex_model_options(Config().SAVE_DIR)
+model_options = util.generate_paddlex_model_options(Config().MODEL_BASE_DIR)
 config=None
 
 def load_model_cached(model_version):
@@ -681,9 +688,9 @@ def create_interface():
     return iface
 
 def main():
-    config = Config()
+    config = Config()    
     monitor_manager = MultiDirectoryMonitor(restart_signal_file_name=config.RESTART_SIGNAL_FILENAME)
-    monitor_manager.add_directory(config.SAVE_DIR)
+    monitor_manager.add_directory(config.MODEL_BASE_DIR)
     monitor_manager.add_directory(config.EXAMPLE_DIR)
     if not monitor_manager.start_all():
         print("❌ 启动目录监控失败")

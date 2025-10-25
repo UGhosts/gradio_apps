@@ -13,11 +13,13 @@ from pathlib import Path
 # --- 全局OCR实例 ---
 ocr_instance = None
 
+from pathlib import Path
+
 # --- 模型目录配置 ---
-MODEL_BASE_DIR = "/home/software/gradio_apps/model/ele_metric_ocr/model"
-RESTART_SIGNAL_FILENAME=".restart_signal_ele_metric"
-EXAMPLE_DIR = "/home/software/gradio_apps/model/ele_metric_ocr/example"
-EXAMPLE_IMAGES = []
+BASE_DIR = Path(__file__).parent.parent
+MODEL_BASE_DIR = BASE_DIR / "model" / "ele_metric_ocr" / "model"
+RESTART_SIGNAL_FILENAME = ".restart_signal_ele_metric"
+EXAMPLE_DIR = BASE_DIR / "model" / "ele_metric_ocr" / "example"
 
 
 model_options = util.generate_paddlex_model_options(MODEL_BASE_DIR)
@@ -51,12 +53,12 @@ def initialize_ocr(model_choice):
             return "✓ 从备用.yaml文件初始化成功"
             
         except Exception as fallback_error:
-            error_msg = (
+            print(
                 f"✗ 初始化模型失败:\n"
                 f"- 主配置失败: {str(first_error)}\n"
                 f"- 备用.yaml文件失败: {str(fallback_error)}"
             )
-            return error_msg
+            return None
 
 
 MAX_OCR_IMAGE_SIZE = 1280 

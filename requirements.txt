@@ -1,3 +1,4 @@
+uv
 PaddleX
 gradio
 pandas
