@@ -113,6 +113,7 @@ def create_interface():
     if not os.path.exists(cwru_dir):
         # 尝试使用其他可能的路径
         alt_paths = [
+            "../dataset/cwru_cls",
             "./dataset/cwru_cls",
             "dataset/cwru_cls",
         ]
@@ -139,6 +140,7 @@ def create_interface():
     if not os.path.exists(model_dir):
         # 尝试使用其他可能的路径
         alt_model_paths = [
+            "../model/cwru_cls",
             "./model/cwru_cls",
             "model/cwru_cls",
         ]

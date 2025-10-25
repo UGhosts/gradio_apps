@@ -63,7 +63,7 @@ class BearingCNN(nn.Module):
         x = self.fc_layers(x)
         return x
 
-def load_model_config(load_dir="../model/zhoucheng/model_config"):
+def load_model_config(load_dir="../model/zhoucheng_cls/cnn"):
     """加载模型配置和标准化参数"""
     if not os.path.exists(load_dir):
         raise FileNotFoundError(f"未找到模型配置目录: {load_dir}")
@@ -242,16 +242,16 @@ def set_selected(file_path, buttons, file_paths):
 
 def create_interface():
     #
-    cwru_dir = os.path.join(os.path.dirname(__file__), "dataset", "zhoucheng")
+    cwru_dir = os.path.join(os.path.dirname(__file__), "dataset", "zhoucheng_cls")
     preset_files = {}
 
     # 确保使用绝对路径或者正确的相对路径
     if not os.path.exists(cwru_dir):
         # 尝试使用其他可能的路径
         alt_paths = [
-            "../dataset/zhoucheng",
-            "./dataset/zhoucheng",
-            "dataset/zhoucheng",
+            "../dataset/zhoucheng_cls",
+            "./dataset/zhoucheng_cls",
+            "dataset/zhoucheng_cls",
         ]
         for path in alt_paths:
             if os.path.exists(path):
@@ -267,15 +267,15 @@ def create_interface():
 
     # 如果没有找到文件，使用默认文件
 
-    model_dir = os.path.join(os.path.dirname(__file__), "model", "zhoucheng")
+    model_dir = os.path.join(os.path.dirname(__file__), "model", "zhoucheng_cls")
     model_options = []  # 将使用元组列表: [(子目录名称, 完整路径)]
 
     if not os.path.exists(model_dir):
         # 尝试使用其他可能的路径
         alt_model_paths = [
-            "../model/zhoucheng",
-            "./model/zhoucheng",
-            "model/zhoucheng",
+            "../model/zhoucheng_cls",
+            "./model/zhoucheng_cls",
+            "model/zhoucheng_cls",
         ]
         for path in alt_model_paths:
             if os.path.exists(path):
