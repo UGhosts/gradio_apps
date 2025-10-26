@@ -5,10 +5,10 @@ FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH} \
     DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
-    PATH="/root/.cargo/bin:${PATH}"
+    PATH="/root/.local/bin:/root/.cargo/bin:${PATH}"
 
 # ==============================================================================
-# 阶段 1: 安装系统依赖、Python 和 uv
+# 阶段 1: 安装系统依赖和 Python
 # ==============================================================================
 RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list && \
     sed -i 's@http://security.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list && \
@@ -28,12 +28,14 @@ RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu
         curl \
         ca-certificates && \
     ln -s /usr/bin/python3.10 /usr/bin/python && \
-    # 安装 uv
-    curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    # 配置 uv 使用国内镜像
-    uv pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# 安装 uv (单独的 RUN 命令)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 配置 uv 使用国内镜像
+RUN /root/.local/bin/uv pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 修复 libcuda.so.1 链接问题
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/libcuda.so.1
@@ -47,7 +49,7 @@ WORKDIR /app
 # 复制依赖文件
 COPY requirements.txt ./
 
-# 使用 uv 安装基础依赖（速度比 pip 快很多）
+# 使用 uv 安装基础依赖(速度比 pip 快很多)
 RUN uv pip install --system --no-cache -r requirements.txt
 
 # ==============================================================================
@@ -58,6 +60,7 @@ RUN uv pip install --system --no-cache paddlepaddle-gpu==3.0.0 \
     --index-url https://www.paddlepaddle.org.cn/packages/stable/cu118/
 
 RUN uv pip install --system langchain==0.3.27
+
 # 安装 PaddleX
 RUN git clone https://github.com/PaddlePaddle/PaddleX.git /tmp/PaddleX && \
     cd /tmp/PaddleX && \
@@ -86,4 +89,4 @@ RUN mkdir -p /app/logs
 
 # 暴露端口并设置默认命令
 EXPOSE 37700-37900
-CMD ["bash", "/app/start_all_apps.sh"]
+CMD ["bash", "/app/shell/start_all_apps.sh"]
