@@ -1,0 +1,13 @@
+cwru_cls:
+  #应用中文名
+  name: 轴承故障诊断
+  #应用简介
+  description: 根据轴承的振动信号，诊断轴承是否存在故障
+  port: 7860
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: ts_classification
+  #关联数据集目录列表
+  datasets:
+    - /datasets/cwru_bearing_datasets
