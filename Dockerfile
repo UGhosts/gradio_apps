@@ -27,6 +27,9 @@ RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu
         git \
         tmux \
         curl \
+        nano \
+        fonts-wqy-microhei \
+        fonts-wqy-zenhei \
         ca-certificates && \
     ln -s /usr/bin/python3.10 /usr/bin/python && \
     apt-get clean && \

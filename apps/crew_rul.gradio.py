@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import gradio as gr
 import pandas as pd
 import numpy as np
@@ -15,10 +16,15 @@ from tensorflow.keras.layers import Layer
 from io import BytesIO
 from PIL import Image
 import matplotlib
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.app_utils import AppUtils as util
 from matplotlib.patches import Rectangle, FancyBboxPatch
 from pathlib import Path
 matplotlib.use('Agg')
+import logging
+
+# 配置日志记录
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 全局变量
 selected_data_path = None
@@ -49,7 +55,7 @@ class Config:
 
     @property
     def MODEL_PATH(self):
-        print(self.MODEL_BASE_DIR)
+        logging.info(self.MODEL_BASE_DIR)
         return self.MODEL_BASE_DIR / f"rul_model_v{self.MODEL_VERSION}.h5"
 
     @property
@@ -92,11 +98,11 @@ def load_model_cached(model_version):
     """加载模型并缓存"""
     if model_version not in model_cache:
         config = Config(model_version=model_version)
-        
         if not os.path.exists(config.MODEL_PATH) or not os.path.exists(config.SCALER_PATH):
+            logging.error(f"找不到模型v{model_version}或scaler文件")
             raise FileNotFoundError(f"找不到模型v{model_version}或scaler文件")
         
-        print(f"🔄 正在加载模型 v{model_version}...")
+        logging.info(f"🔄 正在加载模型 v{model_version}...")
         
         # 使用 compile=False 避免某些序列化问题
         model = load_model(config.MODEL_PATH, custom_objects={
@@ -112,7 +118,7 @@ def load_model_cached(model_version):
                 scaler_X = saved_data['scaler_X']
         except (AttributeError, ModuleNotFoundError) as e:
             # 如果直接加载失败，尝试使用兼容模式
-            print(f"⚠️ 标准加载失败，尝试兼容模式: {e}")
+            logging.warning(f"⚠️ 标准加载失败，尝试兼容模式: {e}")
             import sys
             import types
             
@@ -132,7 +138,7 @@ def load_model_cached(model_version):
         
         model_cache[model_version] = model
         scaler_cache[model_version] = scaler_X
-        print(f"✅ 模型 v{model_version} 加载完成并已缓存")
+        logging.info(f"✅ 模型 v{model_version} 加载完成并已缓存")
     
     return model_cache[model_version], scaler_cache[model_version]
 
@@ -208,7 +214,7 @@ def create_visualization(predicted_rul, config):
         'label_small': 14,     # 小标签
         'ticks': 11           # 刻度
     }
-    
+
     # 优化图表尺寸和布局 - 调整为16:9比例
     fig = plt.figure(figsize=(16, 9))
     gs = fig.add_gridspec(2, 3, hspace=0.30, wspace=0.30, 
@@ -507,8 +513,9 @@ def run_prediction(start_index, model_version):
     return predict_rul(selected_data_path, start_index, model_version)
 
 def create_interface():
-    data_base_dir = "/home/software/gradio_apps/model/crew_rul/dataset"
-    model_dir = "/home/software/gradio_apps/model/crew_rul/model"
+    config = Config()
+    data_base_dir = config.EXAMPLE_DIR
+    model_dir = config.MODEL_BASE_DIR
     
     data_folders = []
     if os.path.exists(data_base_dir):
@@ -700,10 +707,10 @@ def main():
         try:
             port = int(sys.argv[1])
             if port < 1024 or port > 65535:
-                print(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口7863")
+                logging.warning(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口7863")
                 port = 7863
         except ValueError:
-            print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7863")
+            logging.warning(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7863")
 
     iface = create_interface()
     try:

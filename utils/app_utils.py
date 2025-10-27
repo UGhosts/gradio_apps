@@ -30,10 +30,12 @@ class AppUtils:
         try:
             for model in os.listdir(base_dir):
                 model_path = os.path.join(base_dir, model)
-                if os.path.isdir(model_path):  # 只添加目录
+                if os.path.isdir(model_path):
                     model_collection[model] = model_path
         except OSError as e:
             logger.error(f"读取模型目录时出错: {e}")
+        
+        logging.info(f"model_collection: {model_collection}")
             
         return model_collection
 
@@ -43,34 +45,27 @@ class AppUtils:
         自动扫描系统中的字体，找到可用的中文字体并进行配置。
         如果找不到，则会提示。
         """
-        font_keywords = [
-            'Heiti', 'SimHei', 'FangSong', 'KaiTi', 'Lantinghei', '儷黑',
-            'Microsoft YaHei', 'Microsoft JhengHei',
-            'Noto Sans CJK', 'Source Han Sans', 'WenQuanYi', 'wqy-zenhei'
-        ]
-
-        font_paths = fm.findSystemFonts()
-        target_font_path = None
-        for keyword in font_keywords:
-            for font_path in font_paths:
-                if keyword.lower() in os.path.basename(font_path).lower():
-                    target_font_path = font_path
-                    break
-            if target_font_path:
-                break
-        if target_font_path:
+        wqy_font_path = '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc'
+        
+        if os.path.exists(wqy_font_path):
             try:
-                font_prop = fm.FontProperties(fname=target_font_path)
+                # 直接通过文件路径加载字体，不依赖字体缓存
+                from matplotlib import font_manager
+                font_manager.fontManager.addfont(wqy_font_path)
+                
+                font_prop = fm.FontProperties(fname=wqy_font_path)
                 font_name = font_prop.get_name()
-                plt.rcParams['font.family'] = 'sans-serif'
+                
                 plt.rcParams['font.sans-serif'] = [font_name]
                 plt.rcParams['axes.unicode_minus'] = False
+                print(f"✓ 成功配置中文字体: {font_name}")
                 return plt
-                
             except Exception as e:
                 print(f"配置字体时出错: {e}")
-                print("无法自动配置中文字体。")
-                
+                return plt
+        else:
+            print("⚠ 未找到 WQY 字体")
+            return plt
 
 
 class DirectoryHandler(FileSystemEventHandler):

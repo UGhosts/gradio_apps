@@ -13,6 +13,10 @@ import cv2
 import paddlex as pdx
 import gradio as gr
 from PIL import Image
+import logging
+
+# 配置日志记录
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 METER_SHAPE = 512
@@ -528,17 +532,17 @@ def main():
     monitor_manager.add_directory(MODEL_BASE_DIR)
     monitor_manager.add_directory(EXAMPLE_DIR)
     if not monitor_manager.start_all():
-        print("❌ 启动目录监控失败")
+        logging.error("❌ 启动目录监控失败")
         return
     port = 7862
     if len(sys.argv) > 1:
         try:
             port = int(sys.argv[1])
             if port < 1024 or port > 65535:
-                print(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口{port}")
+                logging.warning(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口{port}")
                 port = port
         except ValueError:
-            print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口{port}")
+            logging.warning(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口{port}")
     iface = create_gradio_interface()
     try:
         iface.launch(

@@ -25,7 +25,8 @@ SubModules:
   TextDetection:
     module_name: text_detection
     model_name: PP-OCRv5_mobile_det
-    model_dir: /home/software/gradio_apps/model/ele_metric_ocr/model/PP-OCRv5_mobile_det
+    # model_dir: /home/software/gradio_apps/model/ele_metric_ocr/model/PP-OCRv5_mobile_det
+    model_dir: /app/model/ele_metric_ocr/model/PP-OCRv5_mobile_det
     limit_side_len: 64
     limit_type: min
     max_side_limit: 4000

@@ -1,7 +1,11 @@
 #!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 获取项目根目录（脚本所在目录的上一级）
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # 定义默认值
-APP_FILE="/app/main.py"
+APP_FILE="${PROJECT_ROOT}/main.py"
 APP=""
 PORT=""
 
@@ -70,9 +74,9 @@ while true; do
     
     # 运行你的Python应用
     if [ -n "$PORT" ]; then
-        python "$APP_FILE" "$APP" "$PORT"
+        /home/software/gradio_apps/.venv/bin/python "$APP_FILE" "$APP" "$PORT"
     else
-        python "$APP_FILE" "$APP"
+        /home/software/gradio_apps/.venv/bin/python "$APP_FILE" "$APP"
     fi
     
     EXIT_CODE=$?

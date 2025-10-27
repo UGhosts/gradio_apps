@@ -14,6 +14,10 @@ from pathlib import Path
 ocr_instance = None
 
 from pathlib import Path
+import logging
+# 配置日志记录
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 # --- 模型目录配置 ---
 BASE_DIR = Path(__file__).parent.parent
@@ -25,17 +29,13 @@ EXAMPLE_DIR = BASE_DIR / "model" / "ele_metric_ocr" / "example"
 model_options = util.generate_paddlex_model_options(MODEL_BASE_DIR)
 
 
-# --- 重启信号和文件监控处理 ---
-
 
 def initialize_ocr(model_choice):
     """根据用户选择初始化PaddleX OCR模型"""
     global ocr_instance
     try:
-        print(model_options)
+        logging.info(f"model_choice: {model_options}")
         models_config = model_options[model_choice]
-        
-        # 第一次尝试初始化（如果失败会直接进入except）
         ocr_instance = pdx.create_pipeline(models_config)
         return "✓ 模型初始化成功"
         
@@ -53,7 +53,7 @@ def initialize_ocr(model_choice):
             return "✓ 从备用.yaml文件初始化成功"
             
         except Exception as fallback_error:
-            print(
+            logging.error(
                 f"✗ 初始化模型失败:\n"
                 f"- 主配置失败: {str(first_error)}\n"
                 f"- 备用.yaml文件失败: {str(fallback_error)}"
@@ -106,7 +106,7 @@ def draw_ocr_results(image_path, model_choice):
         if original_image is None:
             return None, "错误: 无法读取图片文件。"
         processed_image, scale_ratio = resize_image_for_ocr(original_image)
-        print(f"图片尺寸已从 {original_image.shape[:2]} 预处理为 {processed_image.shape[:2]}，缩放比例: {scale_ratio:.4f}")
+        logging.info(f"图片尺寸已从 {original_image.shape[:2]} 预处理为 {processed_image.shape[:2]}，缩放比例: {scale_ratio:.4f}")
         # 执行OCR识别 - 兼容不同的方法
         if hasattr(ocr_instance, 'predict'):
             # 使用您原来的predict方法
@@ -267,7 +267,7 @@ def draw_ocr_results(image_path, model_choice):
         return result_image, status_msg
             
     except Exception as e:
-        print(f"OCR 处理过程中发生错误: {e}")
+        logging.error(f"OCR 处理过程中发生错误: {e}")
         import traceback
         traceback.print_exc()
         try:
@@ -294,17 +294,17 @@ def clear_outputs():
 def change_model(model_choice):
     """切换模型时的回调"""
     global ocr_instance
-    ocr_instance = None  # 重置OCR实例，强制重新初始化
+    ocr_instance = None
     return f"已选择模型: {model_choice}，下次识别时将自动加载"
 
-def refresh_examples():
-    """手动刷新示例图片列表"""
-    load_example_images()
-    examples = get_current_examples()
-    status_msg = f"已刷新，找到 {len(EXAMPLE_IMAGES)} 张示例图片"
-    if not examples:
-        status_msg = "*没有找到示例图片，请在 ./examples/ 目录下添加图片文件*"
-    return examples, status_msg
+# def refresh_examples():
+#     """手动刷新示例图片列表"""
+#     load_example_images()
+#     examples = get_current_examples()
+#     status_msg = f"已刷新，找到 {len(EXAMPLE_IMAGES)} 张示例图片"
+#     if not examples:
+#         status_msg = "*没有找到示例图片，请在 ./examples/ 目录下添加图片文件*"
+#     return examples, status_msg
 
 def create_gradio_interface():
     health_check_js = '''
@@ -424,7 +424,7 @@ def main():
     monitor_manager.add_directory(MODEL_BASE_DIR)
     monitor_manager.add_directory(EXAMPLE_DIR)
     if not monitor_manager.start_all():
-        print("❌ 启动目录监控失败")
+        logging.error("❌ 启动目录监控失败")
         return
     port = 7861
     if len(sys.argv) > 1:
@@ -434,7 +434,7 @@ def main():
                 print(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口{port}")
                 port = port
         except ValueError:
-            print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口{port}")
+            logging.warning(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口{port}")
     iface = create_gradio_interface()
     try:
         iface.launch(

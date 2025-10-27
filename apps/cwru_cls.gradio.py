@@ -11,7 +11,9 @@ from utils.app_utils import AppUtils as util
 plt = util.auto_config_chinese_font()
 # 全局变量记录选中的测试文件
 selected_preset = None
-
+import logging
+# 配置日志记录
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def plot_time_series(data, title="时序数据曲线"):
     """绘制时序曲线图"""
@@ -62,7 +64,7 @@ def process_input(selected_model_dir):
         # 保存预测结果并处理显示
         result_df = None
         for res in output:
-            res.print(json_format=True)
+            logging.info(res.print(json_format=True))
             res.save_to_csv(save_path="./output/cwru_cls/")
             res.save_to_json(save_path="./output/cwru_cls/res.json")
 
@@ -216,10 +218,10 @@ def main():
         try:
             port = int(sys.argv[1])
             if port < 1024 or port > 65535:
-                print(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口7860")
+                logging.warning(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口7860")
                 port = 7860
         except ValueError:
-            print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
+            logging.warning(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
 
     demo = create_interface()
     demo.launch(server_name="0.0.0.0", server_port=port, share=False)
