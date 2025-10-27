@@ -5,7 +5,8 @@ FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH} \
     DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
-    PATH="/root/.local/bin:/root/.cargo/bin:${PATH}"
+    PATH="/root/.local/bin:/root/.cargo/bin:${PATH}" \
+    UV_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
 
 # ==============================================================================
 # 阶段 1: 安装系统依赖和 Python
@@ -33,9 +34,6 @@ RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu
 
 # 安装 uv (单独的 RUN 命令)
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 配置 uv 使用国内镜像
-RUN /root/.local/bin/uv pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 修复 libcuda.so.1 链接问题
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/libcuda.so.1
