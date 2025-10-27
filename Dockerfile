@@ -81,6 +81,7 @@ COPY dataset/ ./dataset/
 COPY doc/ ./doc/
 COPY model/ ./model/
 COPY shell/ ./shell/
+COPY utils/ ./utils/
 
 RUN chmod +x /app/shell/start_all_apps.sh /app/shell/start_app.sh
 RUN mkdir -p /app/logs
