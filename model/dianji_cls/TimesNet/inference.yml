@@ -1,0 +1,68 @@
+Global:
+  model_name: TimesNet_cls
+Hpi:
+  backend_configs:
+    paddle_infer:
+      trt_dynamic_shapes:
+        features:
+        - - 1
+          - 5000
+          - 1
+        - - 1
+          - 5000
+          - 1
+        - - 8
+          - 5000
+          - 1
+        pad_mask:
+        - - 1
+          - 5000
+        - - 1
+          - 5000
+        - - 8
+          - 5000
+    tensorrt:
+      dynamic_shapes:
+        features:
+        - - 1
+          - 5000
+          - 1
+        - - 1
+          - 5000
+          - 1
+        - - 8
+          - 5000
+          - 1
+        pad_mask:
+        - - 1
+          - 5000
+        - - 1
+          - 5000
+        - - 8
+          - 5000
+ancestor_classname_set:
+- TimesNet_CLS
+- PaddleBaseClassifier
+- BaseClassifier
+- ABC
+- object
+holiday: false
+info_params:
+  freq: 1
+  group_id: group_id
+  target_cols:
+  - value
+  time_col: time
+input_data:
+  features:
+  - null
+  - 5000
+  - 1
+  pad_mask:
+  - null
+  - 5000
+model_type: classification
+modulename: paddlets.models.classify.dl.timesnet
+scale: true
+size: {}
+time_feat: false

@@ -1,14 +1,9 @@
 import gradio as gr
 import time
-import os
-import pandas as pd
-from paddlex import create_model
-import matplotlib.pyplot as plt
-from io import BytesIO, StringIO
-from PIL import Image
 import sys
 from util.dianji_util import *
 import json
+
 
 # 设置中文字体支持，确保负号能够正确显示
 plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正确显示负号的字体
@@ -16,6 +11,8 @@ plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正
 selected_preset = None
 
 def process_input(selected_model_dir):
+    from paddlex import create_model
+
     """处理全局选中的测试文件，返回图表和结果"""
     time.sleep(1)
     preset_info = f"测试文件: {selected_preset}" if selected_preset else "未选择测试文件"
@@ -25,38 +22,22 @@ def process_input(selected_model_dir):
     if not selected_preset:
         return None, f"错误: 请先选择一个测试文件\n{preset_info}\n{model_info}"
     else:
-        # 保存的图片路径
-        filepath , raw_filepath = plot_envelope_spectrum_no_fs(selected_preset,peak_threshold=0.2,name=os.path.basename(selected_preset))
-
-        selected_model_dir=selected_model_dir.replace('\\','/')
-        from paddlex import create_model
-
-        model = create_model(model_name="PP-LCNet_x1_0", model_dir=selected_model_dir)
+        model = create_model(model_name="TimesNet_cls", model_dir=selected_model_dir)
+        filepath = selected_preset
         output = model.predict(filepath, batch_size=1)
-        savepath="./output/dianji_cls" # 结果目录
+        savepath = "./output/dianji_cls"  # 结果目录
         for res in output:
             res.print()  ## 打印预测的结构化输出
-            res.save_to_img(save_path=savepath)  ## 保存结果可视化图像
-            res.save_to_json(save_path=savepath)  ## 保存预测的结构化输出
+            res.save_to_img(save_path=savepath)
+            res.save_to_json(save_path=savepath)
 
             separator = os.sep
             # 为上传的图片生成唯一文件名
-            json_filename = selected_preset.split(separator)[-1] + '_wave_res.json'
-
+            json_filename = selected_preset.split(separator)[-1].split('.')[0] + '_res.json'
+            img_name = selected_preset.split(separator)[-1].split('.')[0] + '_res.png'
             with open(savepath+"/"+json_filename, 'r', encoding='utf-8') as file:
                 data = json.load(file)
-
-            label_prob = {}
-            for label, score in zip(data['label_names'], data['scores']):
-                # 将英文标签转换为中文
-                chinese_label = "正常" if label == "normal" else "异常"
-                # 保留四位小数并四舍五入
-                label_prob[chinese_label] = round(score, 4)
-
-            # 按照指定格式输出
-            result = f"处理完成，预测概率：正常({label_prob['正常']:.4f})，异常({label_prob['异常']:.4f})"
-
-        return raw_filepath, result
+        return savepath+"/"+img_name, data['classification']
 
 
 def set_selected(file_path, buttons, file_paths):
@@ -78,8 +59,8 @@ def create_interface():
     if not os.path.exists(cwru_dir):
         # 尝试使用其他可能的路径
         alt_paths = [
-            "E:/ai-dataset/motor_fault_detect_/validation/positive_samples",
-            #"../dataset/dianji_cls",
+            #"E:/ai-dataset/motor_fault_detect_/validation/positive_samples",
+            "../dataset/dianji_cls",
             "./dataset/dianji_cls",
             "dataset/dianji_cls",
         ]
@@ -100,15 +81,15 @@ def create_interface():
         preset_files = {"dataset/dianji_cls/t_n1.csv": "📄 t_n1.csv"}
 
     # 从model/dianji_model目录读取子目录作为模型选项
-    model_dir = os.path.join(os.path.dirname(__file__), "model", "dianji_model")
+    model_dir = os.path.join(os.path.dirname(__file__), "model", "dianji_cls")
     model_options = []  # 将使用元组列表: [(子目录名称, 完整路径)]
 
     if not os.path.exists(model_dir):
         # 尝试使用其他可能的路径
         alt_model_paths = [
-            "../model/dianji_model",
-            "./model/dianji_model",
-            "model/dianji_model",
+            "../model/dianji_cls",
+            "./model/dianji_cls",
+            "model/dianji_cls",
         ]
         for path in alt_model_paths:
             if os.path.exists(path):
@@ -180,7 +161,7 @@ def create_interface():
 
 def main():
     # 从命令行参数获取端口号，如果未提供则使用默认端口7860
-    port = 7862
+    port = 7861
     if len(sys.argv) > 1:
         try:
             port = int(sys.argv[1])
