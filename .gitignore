@@ -90,3 +90,11 @@ $RECYCLE.BIN/
 .yapfignore
 .style.yapf
 .pre-commit-config.yaml
+.restart*
+PaddleX/
+PaddleOCR/*
+dataset/*
+model/*/output/*
+model/*/dataset/*
+model/*/train_dataset/*
+/temp/*

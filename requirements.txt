@@ -1,0 +1,16 @@
+uv
+PaddleX
+gradio
+pandas
+matplotlib
+Pillow
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+requests
+huggingface_hub
+opencv-python-headless>=4.5.0
+watchdog
+tensorflow
+logging
