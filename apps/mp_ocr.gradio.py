@@ -46,7 +46,7 @@ def process_input(selected_model_dir):
         )
 
         # 准备输出目录
-        outdir = "./output/mp_ocr"
+        outdir = "../output/mp_ocr"
         os.makedirs(outdir, exist_ok=True)  # 确保输出目录存在
 
         # 保存结果
@@ -183,7 +183,7 @@ def main():
 
     demo = create_interface()
     dataset_dir = os.path.join(os.path.dirname(__file__), "..", "dataset")
-    demo.launch(server_name="0.0.0.0", server_port=port, share=False, allowed_paths=[dataset_dir])
+    demo.launch(server_name="0.0.0.0", server_port=port, share=False, allowed_paths=[dataset_dir,'../output'])
 
 
 if __name__ == "__main__":

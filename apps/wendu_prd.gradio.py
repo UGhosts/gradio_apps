@@ -21,10 +21,8 @@ plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示为方块的问�
 
 def draw_pic(selected_preset):
 
-
-    # 读取两个CSV文件（请替换为你的文件路径）
     file1 = selected_preset.replace('\\','/')
-    file2 = selected_preset.replace('dataset','output').replace('..','.').replace('.csv','_res.csv')
+    file2 = selected_preset.replace('dataset','output').replace('.csv','_res.csv')
     save_pic_name = file2+'.png'
 
     try:
@@ -81,7 +79,7 @@ def process_input(selected_model_dir):
         result_df = None
         for res in output:
             #res.print(json_format=True)
-            res.save_to_csv(save_path="./output/wendu_prd/")
+            res.save_to_csv(save_path="../output/wendu_prd/")
         save_pic_name,csv_file = draw_pic(selected_preset)
         result=''
         with open(csv_file, 'r', encoding='utf-8') as f:
@@ -218,7 +216,7 @@ def main():
             print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
 
     demo = create_interface()
-    demo.launch(server_name="0.0.0.0", server_port=port, share=True)
+    demo.launch(allowed_paths=['../output'],server_name="0.0.0.0", server_port=port, share=False)
 
 
 if __name__ == "__main__":

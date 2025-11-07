@@ -32,13 +32,13 @@ class BearingCNN(nn.Module):
     def __init__(self, input_length, num_classes=5):
         super(BearingCNN, self).__init__()
         self.conv_layers = nn.Sequential(
-            nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1),
+            nn.Conv1d(in_channels=1, out_channels=8, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2),
-            nn.Conv1d(16, 32, kernel_size=3, padding=1),
+            nn.Conv1d(8, 16, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool1d(2),
-            nn.Conv1d(32, 64, kernel_size=3, padding=1),
+            nn.Conv1d(16, 32, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool1d(2)
         )
@@ -51,10 +51,10 @@ class BearingCNN(nn.Module):
 
         self.fc_layers = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(conv_output_size, 256),
+            nn.Linear(conv_output_size, 128),
             nn.ReLU(),
             nn.Dropout(0.5),
-            nn.Linear(256, num_classes),
+            nn.Linear(128, num_classes),
             nn.Softmax(dim=1)
         )
 
@@ -125,7 +125,7 @@ def predict_new_data(model, scaler, new_signal, class_names, file_path):
         plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 
         filepath = file_path + '_wave.png'
-        filepath = filepath.replace('..','.').replace('dataset','output')
+        filepath = filepath.replace('dataset','output')
         plt.savefig(filepath, dpi=300, bbox_inches='tight')
         plt.close()
 

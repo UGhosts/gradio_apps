@@ -1,9 +1,9 @@
 import gradio as gr
 import time
 import sys
-from util.dianji_util import *
+import os
 import json
-
+import matplotlib.pyplot as plt
 
 # 设置中文字体支持，确保负号能够正确显示
 plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正确显示负号的字体
@@ -25,7 +25,7 @@ def process_input(selected_model_dir):
         model = create_model(model_name="TimesNet_cls", model_dir=selected_model_dir)
         filepath = selected_preset
         output = model.predict(filepath, batch_size=1)
-        savepath = "./output/dianji_cls"  # 结果目录
+        savepath = "../output/dianji_cls"  # 结果目录
         for res in output:
             res.print()  ## 打印预测的结构化输出
             res.save_to_img(save_path=savepath)
@@ -172,7 +172,7 @@ def main():
             print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
 
     demo = create_interface()
-    demo.launch(server_name="0.0.0.0", server_port=port, share=False)
+    demo.launch(allowed_paths=['../output'],server_name="0.0.0.0", server_port=port, share=False)
 
 
 if __name__ == "__main__":
