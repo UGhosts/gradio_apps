@@ -74,9 +74,11 @@ while true; do
     
     # 运行你的Python应用
     if [ -n "$PORT" ]; then
-        /home/software/gradio_apps/.venv/bin/python "$APP_FILE" "$APP" "$PORT"
+        # /home/software/gradio_apps/.venv/bin/python "$APP_FILE" "$APP" "$PORT"
+        python "$APP_FILE" "$APP" "$PORT"
     else
-        /home/software/gradio_apps/.venv/bin/python "$APP_FILE" "$APP"
+        # /home/software/gradio_apps/.venv/bin/python "$APP_FILE" "$APP"
+        python "$APP_FILE" "$APP"
     fi
     
     EXIT_CODE=$?
