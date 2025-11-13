@@ -31,9 +31,10 @@ declare -a APPS=(
     "ele_metric:37702"
     "industrial_meter:37703"
     "air_compressor_cls:37704"
-    # 添加更多应用...
-)
-
+    "mp_ocr:37705"
+    "wdndu_pr:37706"
+    "zhoucheng_cls:37707"
+)    
 # 存储所有应用的 PID
 declare -A APP_PIDS
 
