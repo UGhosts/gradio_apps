@@ -15,17 +15,17 @@ SubPipelines:
       DocOrientationClassify:
         module_name: doc_text_orientation
         model_name: PP-LCNet_x1_0_doc_ori
-        model_dir: /app/model/ocr/LCNet_x1_0_doc_ori_infer
+        model_dir: /app/model/ocr/ocr_model/LCNet_x1_0_doc_ori_infer
       DocUnwarping:
         module_name: image_unwarping
         model_name: UVDoc
-        model_dir: /app/model/ocr/UVDoc_infer
+        model_dir: /app/model/ocr/ocr_model/UVDoc_infer
 
 SubModules:
   TextDetection:
     module_name: text_detection
     model_name: PP-OCRv5_mobile_det
-    model_dir: /app/model/ocr/PP-OCRv5_mobile_det_infer
+    model_dir: /app/model/ocr/ocr_model/PP-OCRv5_mobile_det_infer
     limit_side_len: 64
     limit_type: min
     max_side_limit: 4000
@@ -35,11 +35,11 @@ SubModules:
   TextLineOrientation:
     module_name: textline_orientation
     model_name: PP-LCNet_x1_0_textline_ori 
-    model_dir: /app/model/ocr/PP-LCNet_x1_0_textline_ori_infer
+    model_dir: /app/model/ocr/ocr_model/PP-LCNet_x1_0_textline_ori_infer
     batch_size: 6    
   TextRecognition:
     module_name: text_recognition
     model_name: PP-OCRv5_server_rec
-    model_dir: /app/model/ocr/PP-OCRv5_server_rec_infer
+    model_dir: /app/model/ocr/ocr_model/PP-OCRv5_server_rec_infer
     batch_size: 6
     score_thresh: 0.0
