@@ -17,6 +17,7 @@ from sklearn.preprocessing import StandardScaler
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.app_utils import AppUtils as util
 from utils.app_utils import MultiDirectoryMonitor
+from utils.model_utils import FaultClassifierPipeline, FaultClassifierInference
 warnings.filterwarnings('ignore')
 plt = util.auto_config_chinese_font()
 
@@ -54,7 +55,6 @@ fault_code_map = {
     9: '风机过载',
 }
 
-# 故障点描述和建议
 fault_point_analysis = {
     # ----------------------- 1: 主机过载 (Diagnosis) -----------------------
     1: {
@@ -73,10 +73,10 @@ fault_point_analysis = {
             '进气过滤器堵塞'
         ],
         'suggestions': [
-            '检查当前负载是否超过设备额定值',
-            '检查压缩机内部部件磨损情况',
-            '检查润滑油位和油质',
-            '清洁或更换进气过滤器'
+            '确认实际运行压力和产气量是否超过压缩机铭牌额定值；如有变频器，检查变频器运行频率和电流限制设置。',
+            '进行定期的主机大修/检查，特别关注轴承、转子与壳体之间的间隙，判断是否存在抱死或严重摩擦。',
+            '确认润滑油位在视镜的正常范围内；取样分析润滑油的黏度、酸值和颗粒物含量，若油质劣化严重需立即更换。',
+            '检查并记录进气压差，若压差超过制造商规定的阈值（如0.05 bar），应立即清洁或更换滤芯。'
         ]
     },
     # ----------------------- 101: 主机过载 (Warning) -----------------------
@@ -96,10 +96,10 @@ fault_point_analysis = {
             '进气过滤器堵塞'
         ],
         'suggestions': [
-            '检查当前负载是否超过设备额定值',
-            '检查压缩机内部部件磨损情况',
-            '检查润滑油位和油质',
-            '清洁或更换进气过滤器'
+            '确认实际运行压力和产气量是否超过压缩机铭牌额定值；如有变频器，检查变频器运行频率和电流限制设置。',
+            '进行定期的主机大修/检查，特别关注轴承、转子与壳体之间的间隙，判断是否存在抱死或严重摩擦。',
+            '确认润滑油位在视镜的正常范围内；取样分析润滑油的黏度、酸值和颗粒物含量，若油质劣化严重需立即更换。',
+            '检查并记录进气压差，若压差超过制造商规定的阈值（如0.05 bar），应立即清洁或更换滤芯。'
         ]
     },
     # ----------------------- 2: 主机不平衡 (Diagnosis) -----------------------
@@ -119,10 +119,10 @@ fault_point_analysis = {
             '负载分布不均'
         ],
         'suggestions': [
-            '检查三相电源电压平衡度',
-            '检查电机绕组绝缘和阻值',
-            '检查轴承状态和润滑',
-            '调整负载分布'
+            '使用高精度万用表或电能质量分析仪测量三相线电压，确保电压不平衡度低于2%。',
+            '使用兆欧表测量电机绕组的绝缘电阻（应大于5MΩ）；测量三相绕组的直流电阻，确保相间电阻偏差小于2%。',
+            '采用振动分析仪对电机和主机轴承进行状态监测，听诊是否存在异常噪音，并确保轴承得到足够的清洁润滑。',
+            '检查主回路所有接触器的触点是否接触良好，是否存在单相触点烧蚀或接触不良导致的电流不平衡。'
         ]
     },
     # ----------------------- 102: 主机不平衡 (Warning) -----------------------
@@ -142,10 +142,10 @@ fault_point_analysis = {
             '负载分布不均'
         ],
         'suggestions': [
-            '检查三相电源电压平衡度',
-            '检查电机绕组绝缘和阻值',
-            '检查轴承状态和润滑',
-            '调整负载分布'
+            '使用高精度万用表或电能质量分析仪测量三相线电压，确保电压不平衡度低于2%。',
+            '使用兆欧表测量电机绕组的绝缘电阻（应大于5MΩ）；测量三相绕组的直流电阻，确保相间电阻偏差小于2%。',
+            '采用振动分析仪对电机和主机轴承进行状态监测，听诊是否存在异常噪音，并确保轴承得到足够的清洁润滑。',
+            '检查主回路所有接触器的触点是否接触良好，是否存在单相触点烧蚀或接触不良导致的电流不平衡。'
         ]
     },
     # ----------------------- 3: 风机过载 (Diagnosis) -----------------------
@@ -165,10 +165,10 @@ fault_point_analysis = {
             '环境温度过高'
         ],
         'suggestions': [
-            '清洁风扇叶片和散热器',
-            '检查风机轴承状态',
-            '清理风道障碍物',
-            '改善环境通风条件'
+            '使用压缩空气或高压水彻底清洁风扇叶片和油冷却器/后冷却器翅片，确保散热面积最大化。',
+            '检查风机转动是否灵活，听诊是否有异响；必要时拆下风机检查轴承的磨损程度和润滑脂填充情况。',
+            '检查排风口、百叶窗、防尘网等是否有杂物或积尘，确保排风阻力最小。',
+            '确保机房通风良好，室外排风管路通畅，并尽量将环境温度控制在制造商规定的范围内（如低于40°C）。'
         ]
     },
     # ----------------------- 103: 风机过载 (Warning) -----------------------
@@ -188,10 +188,10 @@ fault_point_analysis = {
             '环境温度过高'
         ],
         'suggestions': [
-            '清洁风扇叶片和散热器',
-            '检查风机轴承状态',
-            '清理风道障碍物',
-            '改善环境通风条件'
+            '使用压缩空气或高压水彻底清洁风扇叶片和油冷却器/后冷却器翅片，确保散热面积最大化。',
+            '检查风机转动是否灵活，听诊是否有异响；必要时拆下风机检查轴承的磨损程度和润滑脂填充情况。',
+            '检查排风口、百叶窗、防尘网等是否有杂物或积尘，确保排风阻力最小。',
+            '确保机房通风良好，室外排风管路通畅，并尽量将环境温度控制在制造商规定的范围内（如低于40°C）。'
         ]
     },
     # ----------------------- 4: 排气温度高 (Diagnosis) -----------------------
@@ -211,10 +211,10 @@ fault_point_analysis = {
             '润滑油冷却效果差'
         ],
         'suggestions': [
-            '检查冷却器清洁度和效率',
-            '改善环境通风和温度',
-            '调整压缩机工作压力',
-            '检查润滑油温度和流量'
+            '检查油冷却器和后冷却器是否堵塞，如为水冷型，检查水流量和水质是否符合要求，水温不应过高。',
+            '确保机房温度不超过40°C（或制造商指定限值），检查排风系统是否能有效排出热空气。',
+            '适当降低卸载压力设定值，以减小压缩比，降低主机排气温度。',
+            '检查油过滤器是否堵塞（测量压差），检查温控阀（油断路阀）是否动作正常，确保油能流经冷却器。'
         ]
     },
     # ----------------------- 104: 排气温度高 (Warning) -----------------------
@@ -234,10 +234,10 @@ fault_point_analysis = {
             '润滑油冷却效果差'
         ],
         'suggestions': [
-            '检查冷却器清洁度和效率',
-            '改善环境通风和温度',
-            '调整压缩机工作压力',
-            '检查润滑油温度和流量'
+            '检查油冷却器和后冷却器是否堵塞，如为水冷型，检查水流量和水质是否符合要求，水温不应过高。',
+            '确保机房温度不超过40°C（或制造商指定限值），检查排风系统是否能有效排出热空气。',
+            '适当降低卸载压力设定值，以减小压缩比，降低主机排气温度。',
+            '检查油过滤器是否堵塞（测量压差），检查温控阀（油断路阀）是否动作正常，确保油能流经冷却器。'
         ]
     },
     # ----------------------- 5: 供气压力高 (Diagnosis) -----------------------
@@ -256,10 +256,10 @@ fault_point_analysis = {
             '管路阻力增大'
         ],
         'suggestions': [
-            '检查用气量和压力控制器设定',
-            '校准压力传感器',
-            '检查卸载阀动作是否正常',
-            '检查管路是否有堵塞'
+            '确认压力控制器的加载/卸载压力设定点是否过高，并根据实际用气需求进行合理调整。',
+            '使用标准压力计对供气压力传感器进行校准，确保读数准确性。',
+            '检查进气卸载阀（或容调阀）的气动/电磁控制回路和机械动作是否灵活，确认其能完全打开并卸载。',
+            '检查干燥机、精密过滤器、后处理设备是否存在堵塞或压力损失过大的情况。'
         ]
     },
     # ----------------------- 105: 供气压力高 (Warning) -----------------------
@@ -278,10 +278,10 @@ fault_point_analysis = {
             '管路阻力增大'
         ],
         'suggestions': [
-            '检查用气量和压力控制器设定',
-            '校准压力传感器',
-            '检查卸载阀动作是否正常',
-            '检查管路是否有堵塞'
+            '确认压力控制器的加载/卸载压力设定点是否过高，并根据实际用气需求进行合理调整。',
+            '使用标准压力计对供气压力传感器进行校准，确保读数准确性。',
+            '检查进气卸载阀（或容调阀）的气动/电磁控制回路和机械动作是否灵活，确认其能完全打开并卸载。',
+            '检查干燥机、精密过滤器、后处理设备是否存在堵塞或压力损失过大的情况。'
         ]
     },
     # ----------------------- 6: 电压过低 (Diagnosis) -----------------------
@@ -301,10 +301,10 @@ fault_point_analysis = {
             '电缆截面积过小'
         ],
         'suggestions': [
-            '检查电网供电质量',
-            '检查供电线路和接头',
-            '评估变压器容量是否足够',
-            '检查电缆规格是否匹配'
+            '测量设备进线端的实际电压值，并记录电压波动曲线，判断是否为电网侧问题。',
+            '检查设备主电源回路的接头、端子和断路器触点是否紧固，是否存在接触电阻过大导致压降。',
+            '确保变压器容量大于所有连接设备的启动电流总和及持续运行功率需求。',
+            '确认供电电缆的截面积是否符合国家标准，避免因电缆过细导致线损过大。'
         ]
     },
     # ----------------------- 106: 电压过低 (Warning) -----------------------
@@ -324,10 +324,10 @@ fault_point_analysis = {
             '电缆截面积过小'
         ],
         'suggestions': [
-            '检查电网供电质量',
-            '检查供电线路和接头',
-            '评估变压器容量是否足够',
-            '检查电缆规格是否匹配'
+            '测量设备进线端的实际电压值，并记录电压波动曲线，判断是否为电网侧问题。',
+            '检查设备主电源回路的接头、端子和断路器触点是否紧固，是否存在接触电阻过大导致压降。',
+            '确保变压器容量大于所有连接设备的启动电流总和及持续运行功率需求。',
+            '确认供电电缆的截面积是否符合国家标准，避免因电缆过细导致线损过大。'
         ]
     },
     # ----------------------- 7: 电压过高 (Diagnosis) -----------------------
@@ -347,10 +347,10 @@ fault_point_analysis = {
             '轻载时电压上升'
         ],
         'suggestions': [
-            '联系供电部门调整电压',
-            '调整变压器分接开关',
-            '检查无功补偿装置',
-            '安装稳压装置'
+            '向电力公司报告电网电压长期偏高的问题，要求其进行调整。',
+            '在安全断电情况下，根据变压器铭牌指示，将高压侧分接开关调整至合适的档位，以降低输出电压。',
+            '检查功率因数补偿柜（电容柜）的投切逻辑和接触器，避免过度补偿导致电压升高。',
+            '考虑在设备前安装电源浪涌保护器或高精度稳压设备，以保护敏感电气元件。'
         ]
     },
     # ----------------------- 107: 电压过高 (Warning) -----------------------
@@ -370,13 +370,14 @@ fault_point_analysis = {
             '轻载时电压上升'
         ],
         'suggestions': [
-            '联系供电部门调整电压',
-            '调整变压器分接开关',
-            '检查无功补偿装置',
-            '安装稳压装置'
+            '向电力公司报告电网电压长期偏高的问题，要求其进行调整。',
+            '在安全断电情况下，根据变压器铭牌指示，将高压侧分接开关调整至合适的档位，以降低输出电压。',
+            '检查功率因数补偿柜（电容柜）的投切逻辑和接触器，避免过度补偿导致电压升高。',
+            '考虑在设备前安装电源浪涌保护器或高精度稳压设备，以保护敏感电气元件。'
         ]
     }
 }
+
 
 fault_definitions = {
     1: {
@@ -668,94 +669,6 @@ def generate_fault_data(normal_df, fault_code, fault_definitions,
     
     final_df = pd.concat(all_data_dfs, ignore_index=True)
     return final_df
-
-class FaultClassifierPipeline:
-    """内置标准化的分类器Pipeline"""
-    
-    def __init__(self, model, scaler=None):
-        self.model = model
-        self.scaler = scaler if scaler else StandardScaler()
-        self.is_fitted = False
-    
-    def fit(self, X, y, **kwargs):
-        X_scaled = self.scaler.fit_transform(X)
-        self.model.fit(X_scaled, y, **kwargs)
-        self.is_fitted = True
-        return self
-    
-    def predict(self, X):
-        X_scaled = self.scaler.transform(X)
-        return self.model.predict(X_scaled)
-    
-    def predict_proba(self, X):
-        X_scaled = self.scaler.transform(X)
-        if hasattr(self.model, 'predict_proba'):
-            return self.model.predict_proba(X_scaled)
-        return None
-
-class FaultClassifierInference:
-    """故障分类模型推理类"""
-    
-    def __init__(self, model_path, metadata_path):
-        self.model = joblib.load(model_path)
-        print(f"✓ 模型加载成功: {model_path}")
-        
-        metadata = joblib.load(metadata_path)
-        self.label_mapping = metadata['label_mapping']
-        self.reverse_mapping = metadata['reverse_mapping']
-        self.feature_names = metadata['feature_names']
-        self.model_name = metadata['model_name']
-        self.test_f1 = metadata.get('test_f1', 'N/A')
-    
-    def prepare_features(self, df):
-        """准备特征"""
-        exclude_cols = ['fault_code', 'fault_name', 'timestamp']
-        sensor_cols = [col for col in df.columns 
-                      if col not in exclude_cols and df[col].dtype in ['int64', 'float64']]
-        
-        print(f"  使用原始传感器特征: {len(sensor_cols)} 个")
-        
-        missing_features = set(self.feature_names) - set(sensor_cols)
-        if missing_features:
-            print(f"  警告: 缺失 {len(missing_features)} 个特征，用0填充")
-            for feat in missing_features:
-                df[feat] = 0
-        
-        X = df[self.feature_names].values
-        X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
-        
-        return X
-    
-    def predict_batch(self, samples, return_proba=False):
-        """批量预测"""
-        if isinstance(samples, pd.DataFrame):
-            X = self.prepare_features(samples)
-        else:
-            X = np.array(samples)
-            X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
-        
-        y_pred = self.model.predict(X)
-        fault_codes = [self.reverse_mapping[pred] for pred in y_pred]
-        
-        results = pd.DataFrame({
-            'fault_code': fault_codes,
-            'encoded_label': y_pred
-        })
-        
-        if return_proba:
-            try:
-                proba = self.model.predict_proba(X)
-                results['confidence'] = proba.max(axis=1)
-                
-                num_model_classes = proba.shape[1]
-                for i in range(num_model_classes):
-                    label = self.reverse_mapping.get(i, f'未知类别_{i}')
-                    results[f'prob_{label}'] = proba[:, i]
-            except Exception as e:
-                print(f"  警告：无法获取概率。错误: {e}")
-                results['confidence'] = None
-        
-        return results
 
 def generate_fault_report(df, predictions):
     """生成故障分析报告"""

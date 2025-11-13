@@ -1,6 +1,8 @@
 import sys
 import os
 import importlib.util
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.model_utils import FaultClassifierPipeline
 
 # 主函数：根据传入的应用名运行相应的gradio应用
 def run_app(app_name):
