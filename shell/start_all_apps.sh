@@ -30,7 +30,6 @@ declare -a APPS=(
     "cwru_cls:37701"
     "ele_metric:37702"
     "industrial_meter:37703"
-    "air_compressor_cls:37704"
     # 添加更多应用...
 )
 
