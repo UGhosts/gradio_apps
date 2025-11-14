@@ -1,23 +1,18 @@
 import gradio as gr
 import time
 import os
-import pandas as pd
 from paddlex import create_model
-import matplotlib.pyplot as plt
-from io import BytesIO, StringIO
-from PIL import Image
 import sys
 import csv
-# 设置中文字体支持，确保负号能够正确显示
-plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正确显示负号的字体
-# 全局变量记录选中的测试文件
 selected_preset = None
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
-plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'SimHei', 'Arial Unicode MS']  # 兼容不同系统的中文字体
-plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示为方块的问题
+from pathlib import Path
+BASE_DIR = Path(__file__).parent.parent
+from utils.app_utils import AppUtils as util
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+plt = util.auto_config_chinese_font()
 
 def draw_pic(selected_preset):
 
@@ -79,7 +74,7 @@ def process_input(selected_model_dir):
         result_df = None
         for res in output:
             #res.print(json_format=True)
-            res.save_to_csv(save_path="../output/wendu_prd/")
+            res.save_to_csv(save_path=f"{BASE_DIR}/output/wendu_prd/")
         save_pic_name,csv_file = draw_pic(selected_preset)
         result=''
         with open(csv_file, 'r', encoding='utf-8') as f:
@@ -109,7 +104,7 @@ def create_interface():
     if not os.path.exists(cwru_dir):
         # 尝试使用其他可能的路径
         alt_paths = [
-            "../dataset/wendu_prd",
+            f"{BASE_DIR}/dataset/wendu_prd",
             "./dataset/wendu_prd",
             "dataset/wendu_prd",
         ]
@@ -131,7 +126,7 @@ def create_interface():
     if not os.path.exists(model_dir):
         # 尝试使用其他可能的路径
         alt_model_paths = [
-            "../model/wendu_prd",
+            f"{BASE_DIR}/model/wendu_prd",
             "./model/wendu_prd",
             "model/wendu_prd",
         ]
@@ -216,7 +211,7 @@ def main():
             print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
 
     demo = create_interface()
-    demo.launch(allowed_paths=['../output'],server_name="0.0.0.0", server_port=port, share=False)
+    demo.launch(allowed_paths=[f'{BASE_DIR}/output'],server_name="0.0.0.0", server_port=port, share=False)
 
 
 if __name__ == "__main__":

@@ -47,7 +47,7 @@ logs/
 .env.production.local
 
 # 输出文件
-output/
+output/*/*
 results/
 
 # 数据库文件
@@ -98,3 +98,4 @@ model/*/output/*
 model/*/dataset/*
 model/*/train_dataset/*
 /temp/*
+*.pybak

@@ -5,10 +5,11 @@ import os
 import json
 import matplotlib.pyplot as plt
 
-# 设置中文字体支持，确保负号能够正确显示
-plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正确显示负号的字体
-# 全局变量记录选中的测试文件
-selected_preset = None
+from pathlib import Path
+BASE_DIR = Path(__file__).parent.parent
+from utils.app_utils import AppUtils as util
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+plt = util.auto_config_chinese_font()
 
 def process_input(selected_model_dir):
     from paddlex import create_model
@@ -25,7 +26,7 @@ def process_input(selected_model_dir):
         model = create_model(model_name="TimesNet_cls", model_dir=selected_model_dir)
         filepath = selected_preset
         output = model.predict(filepath, batch_size=1)
-        savepath = "../output/dianji_cls"  # 结果目录
+        savepath = f"{BASE_DIR}/output/dianji_cls"  # 结果目录
         for res in output:
             res.print()  ## 打印预测的结构化输出
             res.save_to_img(save_path=savepath)
@@ -60,7 +61,7 @@ def create_interface():
         # 尝试使用其他可能的路径
         alt_paths = [
             #"E:/ai-dataset/motor_fault_detect_/validation/positive_samples",
-            "../dataset/dianji_cls",
+            f"{BASE_DIR}/dataset/dianji_cls",
             "./dataset/dianji_cls",
             "dataset/dianji_cls",
         ]
@@ -87,7 +88,7 @@ def create_interface():
     if not os.path.exists(model_dir):
         # 尝试使用其他可能的路径
         alt_model_paths = [
-            "../model/dianji_cls",
+            f"{BASE_DIR}/model/dianji_cls",
             "./model/dianji_cls",
             "model/dianji_cls",
         ]
@@ -172,7 +173,7 @@ def main():
             print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
 
     demo = create_interface()
-    demo.launch(allowed_paths=['../output'],server_name="0.0.0.0", server_port=port, share=False)
+    demo.launch(allowed_paths=[f'{BASE_DIR}/output'],server_name="0.0.0.0", server_port=port, share=False)
 
 
 if __name__ == "__main__":

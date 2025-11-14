@@ -19,14 +19,15 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import json
+from pathlib import Path
 
+BASE_DIR = Path(__file__).parent.parent
+from utils.app_utils import AppUtils as util
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+plt = util.auto_config_chinese_font()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# 设置中文字体支持，确保负号能够正确显示
-plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正确显示负号的字体
-# 全局变量记录选中的测试文件
-selected_preset = None
 
 class BearingCNN(nn.Module):
     def __init__(self, input_length, num_classes=5):
@@ -63,7 +64,7 @@ class BearingCNN(nn.Module):
         x = self.fc_layers(x)
         return x
 
-def load_model_config(load_dir="../model/zhoucheng_cls/cnn"):
+def load_model_config(load_dir=f"{BASE_DIR}/model/zhoucheng_cls/cnn"):
     """加载模型配置和标准化参数"""
     if not os.path.exists(load_dir):
         raise FileNotFoundError(f"未找到模型配置目录: {load_dir}")
@@ -249,7 +250,7 @@ def create_interface():
     if not os.path.exists(cwru_dir):
         # 尝试使用其他可能的路径
         alt_paths = [
-            "../dataset/zhoucheng_cls",
+            f"{BASE_DIR}/dataset/zhoucheng_cls",
             "./dataset/zhoucheng_cls",
             "dataset/zhoucheng_cls",
         ]
@@ -273,7 +274,7 @@ def create_interface():
     if not os.path.exists(model_dir):
         # 尝试使用其他可能的路径
         alt_model_paths = [
-            "../model/zhoucheng_cls",
+            f"{BASE_DIR}/model/zhoucheng_cls",
             "./model/zhoucheng_cls",
             "model/zhoucheng_cls",
         ]
