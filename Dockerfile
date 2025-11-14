@@ -51,7 +51,7 @@ WORKDIR /app
 COPY requirements.txt ./
 
 # 使用 uv 安装基础依赖(速度比 pip 快很多)
-RUN uv pip install --system --no-cache -r requirements.txt
+RUN uv pip install --system --no-cache -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu126
 
 # ==============================================================================
 # 阶段 3: 安装 PaddlePaddle 和 PaddleX
