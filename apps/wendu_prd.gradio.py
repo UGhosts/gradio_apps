@@ -111,7 +111,7 @@ def create_interface():
         alt_paths = [
             "../dataset/wendu_prd",
             "./dataset/wendu_prd",
-            s"dataset/wendu_prd",
+            "dataset/wendu_prd",
         ]
         for path in alt_paths:
             if os.path.exists(path):
