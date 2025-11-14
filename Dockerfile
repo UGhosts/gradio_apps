@@ -57,8 +57,8 @@ RUN uv pip install --system --no-cache -r requirements.txt
 # 阶段 3: 安装 PaddlePaddle 和 PaddleX
 # ==============================================================================
 # 安装 PaddlePaddle
-RUN uv pip install --system --no-cache paddlepaddle-gpu==3.0.0 \
-    --index-url https://www.paddlepaddle.org.cn/packages/stable/cu118/
+RUN uv pip install --system --no-cache paddlepaddle-gpu==3.1.1 \
+    --index-url https://www.paddlepaddle.org.cn/packages/stable/cu126/
 
 RUN uv pip install --system langchain==0.3.27
 

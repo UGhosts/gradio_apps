@@ -15,3 +15,5 @@ watchdog
 tensorflow
 logging
 taospy
+torch 
+torchvision

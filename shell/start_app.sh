@@ -75,7 +75,7 @@ while true; do
     # 运行你的Python应用
     if [ -n "$PORT" ]; then
         if [ "$PORT" -lt 10000 ]; then
-            /home/software/gradio_apps/temp/.venv/bin/python "$APP_FILE" "$APP" "$PORT"
+            /home/software/gradio_apps-bak/temp/.venv/bin/python "$APP_FILE" "$APP" "$PORT"
         else
             python "$APP_FILE" "$APP" "$PORT"
         fi
