@@ -99,3 +99,4 @@ model/*/dataset/*
 model/*/train_dataset/*
 /temp/*
 *.pybak
+model/air_compressor/data/*
