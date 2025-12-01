@@ -47,7 +47,7 @@ logs/
 .env.production.local
 
 # 输出文件
-output/
+output/*/*
 results/
 
 # 数据库文件
@@ -90,3 +90,13 @@ $RECYCLE.BIN/
 .yapfignore
 .style.yapf
 .pre-commit-config.yaml
+.restart*
+PaddleX/
+PaddleOCR/*
+dataset/*
+model/*/output/*
+model/*/dataset/*
+model/*/train_dataset/*
+/temp/*
+*.pybak
+model/air_compressor/data/*

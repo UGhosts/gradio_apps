@@ -1,0 +1,81 @@
+Global:
+  model: SegFormer-B1
+  mode: check_dataset # check_dataset/train/evaluate/predict
+  dataset_dir: "/home/software/gradio_apps/model/industrail_metric_det/dataset/meter_seg"
+  device: gpu:0,1
+  output: "/home/software/gradio_apps/model/industrail_metric_det/output/seg_model_output"
+
+CheckDataset:
+  convert: 
+    enable: False
+    src_dataset_type: null
+  split: 
+    enable: False
+    train_percent: null
+    val_percent: null
+
+
+Train:
+  epochs_iters: 2000
+  num_classes: 3  
+  batch_size: 4
+  learning_rate: 0.001
+  pretrain_weight_path: https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SegFormer-B1_backbone_imagenet_pretrained.pdparams
+  warmup_steps: 0
+  resume_path: null
+  log_interval: 10
+  eval_interval: 100
+  save_interval_epochs: 5
+  # transforms:
+  #   train:
+  #     - Decode: {}
+  #     - Resize:
+  #         target_size: [512, 512] 
+  #         keep_ratio: False
+  #     - RandomHorizontalFlip:
+  #         prob: 0.5
+  #     - Normalize:
+  #         mean: [0.485, 0.456, 0.406]
+  #         std: [0.229, 0.224, 0.225]
+  #   eval:
+  #     - Decode: {}
+  #     - Resize:
+  #         target_size: [512, 512]
+  #         keep_ratio: False
+  #     - Normalize:
+  #         mean: [0.485, 0.456, 0.406]
+  #         std: [0.229, 0.224, 0.225]
+  transforms:
+    train:
+      - Decode: {}
+      - Resize:
+          target_size: [512, 512] 
+          keep_ratio: False
+      # 增加颜色扰动
+      - RandomDistort:
+          brightness_range: 0.4
+          contrast_range: 0.4
+          saturation_range: 0.4
+      # 增加随机旋转
+      - RandomRotation:
+          max_rotation: 15
+      - RandomHorizontalFlip:
+          prob: 0.5
+      - Normalize:
+          mean: [0.485, 0.456, 0.406]
+          std: [0.229, 0.224, 0.225]
+
+
+Evaluate:
+  weight_path: "/home/software/gradio_apps/model/industrail_metric_det/output/seg_model_output/best_model/model.pdparams"
+  log_interval: 10
+
+Export:
+  weight_path: https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SegFormer-B1_pretrained.pdparams
+
+Predict:
+  batch_size: 1
+  model_dir: "/home/software/gradio_apps/model/industrail_metric_det/model/SegFormer-B1"
+  input: "https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/general_semantic_segmentation_002.png"
+  kernel_option:
+    run_mode: paddle

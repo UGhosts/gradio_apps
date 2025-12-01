@@ -2,23 +2,18 @@ import gradio as gr
 import time
 import os
 import pandas as pd
-# 尝试导入paddle相关模块，如果失败则设置标志
-try:
-    from paddlex import create_model
-    paddle_available = True
-except ImportError:
-    paddle_available = False
-import matplotlib.pyplot as plt
+from paddlex import create_model
 from io import BytesIO, StringIO
 from PIL import Image
 import sys
-import gradio as gr
-
+from utils.app_utils import AppUtils as util
 # 设置中文字体支持，确保负号能够正确显示
-plt.rcParams["font.family"] = ["DejaVu Sans", "SimHei"]  # 优先使用能够正确显示负号的字体
+plt = util.auto_config_chinese_font()
 # 全局变量记录选中的测试文件
 selected_preset = None
-
+import logging
+# 配置日志记录
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def plot_time_series(data, title="时序数据曲线"):
     """绘制时序曲线图"""
@@ -89,7 +84,7 @@ def process_input(selected_model_dir):
         # 保存预测结果并处理显示
         result_df = None
         for res in output:
-            res.print(json_format=True)
+            logging.info(res.print(json_format=True))
             res.save_to_csv(save_path="./output/cwru_cls/")
             res.save_to_json(save_path="./output/cwru_cls/res.json")
 
@@ -145,6 +140,7 @@ def create_interface():
     if not os.path.exists(cwru_dir):
         # 尝试使用其他可能的路径
         alt_paths = [
+            "../dataset/cwru_cls",
             "./dataset/cwru_cls",
             "dataset/cwru_cls",
         ]
@@ -171,6 +167,7 @@ def create_interface():
     if not os.path.exists(model_dir):
         # 尝试使用其他可能的路径
         alt_model_paths = [
+            "../model/cwru_cls",
             "./model/cwru_cls",
             "model/cwru_cls",
         ]
@@ -249,10 +246,10 @@ def main():
         try:
             port = int(sys.argv[1])
             if port < 1024 or port > 65535:
-                print(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口7860")
+                logging.warning(f"警告：端口号 {port} 不在有效范围内(1024-65535)，将使用默认端口7860")
                 port = 7860
         except ValueError:
-            print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
+            logging.warning(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
 
     demo = create_interface()
     demo.launch(server_name="0.0.0.0", server_port=port, share=False)
