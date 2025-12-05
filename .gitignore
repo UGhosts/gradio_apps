@@ -100,3 +100,4 @@ model/*/train_dataset/*
 /temp/*
 *.pybak
 model/air_compressor/data/*
+model/driver_belt_rul/data/*

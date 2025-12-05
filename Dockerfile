@@ -63,7 +63,7 @@ RUN uv pip install --system --no-cache paddlepaddle-gpu==3.1.1 \
 RUN uv pip install --system langchain==0.3.27
 
 # 安装 PaddleX
-RUN git clone https://github.com/PaddlePaddle/PaddleX.git /tmp/PaddleX && \
+RUN git clone --depth 1 --branch v3.3.9 https://github.com/PaddlePaddle/PaddleX.git /tmp/PaddleX && \
     cd /tmp/PaddleX && \
     uv pip install --system --no-cache -e ".[base]" && \
     uv pip install --system --no-cache -e ".[ocr]" && \
