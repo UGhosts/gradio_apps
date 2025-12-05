@@ -36,6 +36,7 @@ declare -a APPS=(
     "zhoucheng_cls:37707"
     "dianji_cls:37708"
     "belt_det:37709"
+    "driver_belt_rul:37710"
 )    
 # 存储所有应用的 PID
 declare -A APP_PIDS
