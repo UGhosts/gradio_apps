@@ -835,7 +835,8 @@ def create_gradio_interface():
                         label="模型状态",
                         value="请选择模型...",
                         interactive=False,
-                        lines=5
+                        lines=5,
+                        visible=False
                     )
                     
                     gr.Markdown("### 📁 数据输入 (优先使用模拟数据)")
@@ -849,12 +850,13 @@ def create_gradio_interface():
                     
                     refresh_btn = gr.Button("🔄 刷新文件列表", size="sm")
                     
-                    gr.Markdown("或")
+                    # gr.Markdown("或")
                     
                     csv_input = gr.File(
                         label="上传CSV文件 (备选)",
                         file_types=[".csv"],
-                        type="filepath"
+                        type="filepath",
+                        visible=False
                     )
                     
                     predict_btn = gr.Button("🔍 开始预测", variant="primary", size="lg")
