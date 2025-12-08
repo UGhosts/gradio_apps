@@ -1,0 +1,7 @@
+pyAudioAnalysis
+eyed3
+pydub
+plotly
+numpy
+scikit-learn
+imbalanced-learn
