@@ -151,7 +151,7 @@ def train_model():
         return None
 
 # 测试模型
-def test_model(model_name, model_type="svm"):
+def test_model(model_name, model_type="randomforest"):
     """测试训练好的模型"""
     print("开始测试模型...")
     

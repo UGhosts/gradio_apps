@@ -39,7 +39,6 @@ def load_models():
 # 预测函数
 def predict(audio_path, model_name):
     try:
-        import pickle
         # 确定模型类型
         model_type = ""
         if "svm" in model_name.lower():
@@ -53,12 +52,15 @@ def predict(audio_path, model_name):
         else:
             return "无法确定模型类型"
         
-        # 执行预测
+        # 执行预测 - 结合train.py中的方法和音频预处理
         model_path = os.path.join(MODEL_DIR, model_name)
+        print(f"使用模型: {model_name}，类型: {model_type}")
+        print(f"模型路径: {model_path}")
         
-        # 先获取音频的特征，看看发生了什么
-        from pyAudioAnalysis import ShortTermFeatures as aF
+        # 音频预处理 - 修复energy_entropy函数的重塑错误
         from pyAudioAnalysis import audioBasicIO as aIO
+        import numpy as np
+        import wave
         
         # 读取音频文件
         [Fs, x] = aIO.read_audio_file(audio_path)
@@ -66,107 +68,71 @@ def predict(audio_path, model_name):
         if x.ndim > 1:
             x = np.mean(x, axis=1)
         
-        # 添加详细的音频数据调试信息
         print(f"音频长度: {x.shape[0]} 采样点")
         print(f"采样率: {Fs} Hz")
         print(f"音频数据形状: {x.shape}")
         print(f"音频数据大小: {x.size}")
         print(f"音频数据类型: {x.dtype}")
         
-        # 检查是否有6400大小的数组 - 这是用户报告的问题
-        if x.size == 6400:
-            print("⚠️  检测到大小为6400的音频数据，这会导致重塑错误")
-            
-            # 关键修复：将音频数据扩展到8000个采样点（添加1600个零）
-            # 这样可以确保特征提取时能生成足够的时间帧
-            x = np.pad(x, (0, 8000 - x.size), 'constant')
-            print(f"✅ 已将音频数据扩展到: {x.size} 采样点")
-        
-        # 计算特征（与模型训练时使用的参数一致）
-        win, step = 0.050, 0.025  # 50ms窗口，25ms步长
-        win_size = int(win * Fs)
-        step_size = int(step * Fs)
-        
-        # 确保窗口大小和步长有效
-        if x.size < win_size:
-            print(f"❌ 音频太短，无法提取特征: {x.size} < {win_size}")
-            return "音频文件太短，无法进行分析"
-        
-        # 提取特征
-        [f, fn] = aF.feature_extraction(x, Fs, win_size, step_size)
-        print(f"特征提取结果 - 形状: {f.shape}, 特征数: {f.shape[0]}, 时间帧: {f.shape[1]}")
-        
-        # 计算特征统计值（均值和标准差）
-        # 这与模型训练时使用的特征处理方式一致
-        feature_vector = []
-        for i in range(f.shape[0]):
-            feature_vector.append(np.mean(f[i, :]))
-            feature_vector.append(np.std(f[i, :]))
-        
-        feature_vector = np.array(feature_vector)
-        print(f"特征向量 - 形状: {feature_vector.shape}, 大小: {feature_vector.size}")
-        
-        # 加载模型并执行分类
-        try:
-            with open(model_path, 'rb') as model_file:
-                model = pickle.load(model_file)
-            
-            # 检查特征数量是否匹配
-            expected_features = model.n_features_in_
-            print(f"模型期望特征数: {expected_features}")
-            print(f"实际特征数: {feature_vector.size}")
-            
-            if feature_vector.size != expected_features:
-                print(f"❌ 特征数量不匹配: {feature_vector.size} != {expected_features}")
-                return "特征数量不匹配，模型可能需要更新"
-            
-            # 执行预测
-            prediction = model.predict(feature_vector.reshape(1, -1))[0]
-            probabilities = model.predict_proba(feature_vector.reshape(1, -1))[0]
-            
-            print(f"分类结果 - 类别: {prediction}, 概率: {probabilities}")
-        except Exception as model_error:
-            print(f"❌ 模型加载或预测出错: {str(model_error)}")
-            import traceback
-            traceback.print_exc()
-            
-            # 回退到使用pyAudioAnalysis的分类函数，但先确保音频足够长
-            if x.size < 8000:
-                print("❌ 回退到pyAudioAnalysis分类前，再次扩展音频")
-                x = np.pad(x, (0, 8000 - x.size), 'constant')
-                print(f"✅ 已将音频数据扩展到: {x.size} 采样点")
-                
-                # 重新保存修改后的音频
-                import wave
-                with wave.open(audio_path, 'w') as wf:
-                    wf.setnchannels(1)
-                    wf.setsampwidth(2)
-                    wf.setframerate(Fs)
-                    wf.writeframes(x.astype(np.int16).tobytes())
-            
-            print("回退到使用pyAudioAnalysis的分类函数")
-            result = aT.file_classification(audio_path, model_path, model_type)
-            
-            # 处理预测结果
-            pred_label = 0
-            probabilities = [0.0, 0.0]
-            
-            if isinstance(result, tuple):
-                if len(result) == 2:
-                    prediction, probabilities = result
-                    pred_label = int(np.argmax(probabilities))
-                else:
-                    pred_label = int(result[0])
-                    probabilities[pred_label] = 1.0
+        # 关键修复：强制将音频长度设置为1秒（8000采样点）
+        # 这确保了short_window和short_step参数的正确计算
+        target_length = 8000
+        if x.size != target_length:
+            if x.size < target_length:
+                print(f"⚠️  音频太短 ({x.size} 采样点)，扩展到 {target_length} 采样点")
+                x = np.pad(x, (0, target_length - x.size), 'constant')
             else:
-                pred_label = int(result)
+                print(f"⚠️  音频太长 ({x.size} 采样点)，截断到 {target_length} 采样点")
+                x = x[:target_length]
+            print(f"✅ 已调整音频数据长度为: {x.size} 采样点")
+        
+        # 重新保存修改后的音频
+        with wave.open(audio_path, 'w') as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(Fs)
+            wf.writeframes(x.astype(np.int16).tobytes())
+        
+        # 使用pyAudioAnalysis的分类函数进行预测
+        result = aT.file_classification(audio_path, model_path, model_type)
+        
+        # 处理预测结果 - 与train.py中的处理方式保持一致
+        pred_label = 0
+        probabilities = [0.0, 0.0]
+        
+        if isinstance(result, tuple):
+            if len(result) == 2:
+                # 预期格式：(prediction, probabilities)
+                prediction, probabilities = result
+                pred_label = int(np.argmax(probabilities))
+            else:
+                # 只使用第一个返回值作为预测结果
+                pred_label = int(result[0])
                 probabilities[pred_label] = 1.0
-            
-            prediction = pred_label
+        else:
+            # 如果是单个值，假设它是预测标签
+            pred_label = int(result)
+            probabilities[pred_label] = 1.0
+        
+        # 确保probabilities是数组格式
+        if not isinstance(probabilities, (list, np.ndarray)):
+            # 如果是标量，转换为二元分类的概率数组
+            prob_value = float(probabilities)
+            if prob_value >= 0.5:
+                pred_label = 1
+                probabilities = [1.0 - prob_value, prob_value]
+            else:
+                pred_label = 0
+                probabilities = [1.0 - prob_value, prob_value]
+        else:
+            # 如果已经是数组，使用argmax获取标签
+            pred_label = int(np.argmax(probabilities))
+        
+        print(f"分类结果 - 类别: {pred_label}, 概率: {probabilities}")
         
         # 返回结果
         return {
-            "label": LABEL_MAPPING[prediction],
+            "label": LABEL_MAPPING[pred_label],
             "probabilities": {
                 "异常噪声": round(float(probabilities[0]) * 100, 2),
                 "正常噪声": round(float(probabilities[1]) * 100, 2)
