@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风扇噪声分类系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .probability {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>风扇噪声分类系统</h1>
+        <form method="post" action="/predict" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="audio">上传音频文件 (.wav)</label>
+                <input type="file" id="audio" name="audio" accept=".wav" required>
+            </div>
+            <div class="form-group">
+                <label for="model">选择模型</label>
+                <select id="model" name="model" required>
+                    {% for model in models %}
+                    <option value="{{ model }}">{{ model }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">开始预测</button>
+        </form>
+        {% if result %}
+        <div class="result">
+            <h3>预测结果</h3>
+            <p>音频文件: {{ audio_name }}</p>
+            {% if result and result.label and result.probabilities %}
+            <p>分类结果: {{ result.label }}</p>
+            <div class="probability">
+                <p>异常噪声概率: {{ result.probabilities['异常噪声'] }}%</p>
+                <p>正常噪声概率: {{ result.probabilities['正常噪声'] }}%</p>
+            </div>
+            {% else %}
+            <p>{{ result }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
