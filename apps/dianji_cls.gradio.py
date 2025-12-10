@@ -234,7 +234,7 @@ def vibration_analysis_core(csv_path,savepath):
         # 保存综合分析图
         #main_plot_path = os.path.join(SAVE_DIR, "vibration_analysis_with_kurtosis.png")
         #print(savepath)
-        main_plot_path = f'{BASE_DIR}/output/dianji_cls'+uuid.uuid4().hex+'.png'
+        main_plot_path = f'{BASE_DIR}/output/dianji_cls/'+uuid.uuid4().hex+'.png'
         plt.savefig(main_plot_path, dpi=300, bbox_inches='tight')
         plt.close()
 
