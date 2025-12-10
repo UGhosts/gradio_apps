@@ -25,6 +25,7 @@ BASE_DIR = Path(__file__).parent.parent
 from utils.app_utils import AppUtils as util
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 plt = util.auto_config_chinese_font()
+os.makedirs(f'{BASE_DIR}/output/zhoucheng_cls/', exist_ok=True)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

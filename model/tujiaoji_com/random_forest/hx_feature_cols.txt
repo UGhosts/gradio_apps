@@ -1,0 +1,15 @@
+PV_HXWD_SDZ
+PV_HXWD_DQZ
+PV_HX_FRBWD
+temp
+V_rms_x
+V_rms_y
+V_rms_z
+A_rms_x
+A_rms_y
+A_rms_z
+D_rms_x
+D_rms_y
+D_rms_z
+dlz
+dyz
