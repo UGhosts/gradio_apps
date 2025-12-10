@@ -193,7 +193,7 @@ def analyze_gearbox_vibration(csv_path, save_dir="./"):
     # 保存图片
     os.makedirs(save_dir, exist_ok=True)
     #image_save_path = os.path.join(save_dir, '4轴振动特征整合图_优化版.png')
-    image_save_path = f'{BASE_DIR}/output/chilun_cls'+uuid.uuid4().hex+'.png'
+    image_save_path = f'{BASE_DIR}/output/chilun_cls/'+uuid.uuid4().hex+'.png'
     plt.savefig(image_save_path, bbox_inches='tight', dpi=300)
     plt.close()  # 关闭图形，释放内存
 
