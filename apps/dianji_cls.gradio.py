@@ -257,7 +257,7 @@ def vibration_analysis_core(csv_path,savepath):
         # plt.legend()
         # kurtosis_plot_path = os.path.join(SAVE_DIR, "sliding_kurtosis_trend.png")
         # plt.savefig(kurtosis_plot_path, dpi=300, bbox_inches='tight')
-        plt.close()
+        # plt.close()
 
         return main_plot_path
 
