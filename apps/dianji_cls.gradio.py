@@ -149,7 +149,7 @@ def vibration_analysis_core(csv_path,savepath):
         os.makedirs(SAVE_DIR, exist_ok=True)
 
         # 设置绘图样式
-        plt.rcParams['font.sans-serif'] = ['SimHei']
+        #plt.rcParams['font.sans-serif'] = ['SimHei']
         plt.rcParams['axes.unicode_minus'] = False
         plt.rcParams['figure.figsize'] = (18, 15)
 
