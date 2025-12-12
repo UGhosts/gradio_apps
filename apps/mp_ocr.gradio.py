@@ -111,8 +111,8 @@ def create_interface():
         default_model_dir = os.path.join(model_dir, default_model_name)
         model_options.append((default_model_name, default_model_dir))
 
-    with gr.Blocks(title="工业OCR") as demo:
-        gr.Markdown("# 🚀 工业OCR")
+    with gr.Blocks(title="工业铭牌OCR") as demo:
+        gr.Markdown("# 🚀 工业铭牌OCR")
 
         with gr.Row():
             with gr.Column(scale=1):

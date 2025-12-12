@@ -1,3 +1,6 @@
+import datetime
+from typing import Tuple
+
 import gradio as gr
 import time
 import os
@@ -12,11 +15,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import json
 from pathlib import Path
@@ -25,9 +24,129 @@ BASE_DIR = Path(__file__).parent.parent
 from utils.app_utils import AppUtils as util
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 plt = util.auto_config_chinese_font()
+os.makedirs(f'{BASE_DIR}/output/zhoucheng_cls/', exist_ok=True)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+def generate_bearing_analysis_report(data: dict) -> Tuple[str, str]:
+    category_mapping = {
+        'ball': '滚动体故障',
+        'inner': '内圈故障',
+        'keep': '保持架故障',
+        'ok': '正常',
+        'outer': '外圈故障'
+    }
+    labels = [category_mapping[key] for key in data.keys()]
+    values = [data[key] for key in data.keys()]
+
+    # 2. 生成优化后的环形图（解决标签重叠）
+    fig, ax = plt.subplots(figsize=(4, 4))
+    wedges, texts = ax.pie(
+        values,
+        wedgeprops=dict(width=0.4),  # 环形宽度
+        startangle=90,
+        colors=['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57']
+    )
+
+    # 单独创建图例（避免标签挤在图上）
+    ax.legend(
+        wedges, labels,
+        title="故障类型",
+        loc="center left",
+        bbox_to_anchor=(1, 0, 0.5, 1)  # 图例放在图右侧
+    )
+    # 找到概率最大的类别和对应数值
+    max_value = max(values)
+    max_index = values.index(max_value)
+    max_label = labels[max_index]
+
+    # 在环形图中心显示概率最大的类别和数值
+    ax.text(0, 0, f'{max_label}\n概率 {max_value:.6f}',
+            ha='center', va='center', fontsize=12, fontweight='bold')
+    # 在环形图中心显示主要信息
+    # total_ok = values[labels.index('正常')]
+    # ax.text(0, 0, f'正常概率\n{total_ok:.6f}', ha='center', va='center', fontsize=12, fontweight='bold')
+
+    ax.set_title('轴承故障分析 - 预测概率分布', fontsize=14, fontweight='bold', pad=20)
+    plt.tight_layout()  # 自动调整布局
+
+    # 保存图片
+    img_dir = f"{BASE_DIR}/output/zhoucheng_cls/"
+    os.makedirs(img_dir, exist_ok=True)
+    current_time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    img_path = os.path.join(img_dir, f'bearing_analysis_{current_time}.png')
+    plt.savefig(img_path, dpi=100, bbox_inches='tight')
+    plt.close()
+
+    # 3. 健康状态评估
+    ok_prob = data['ok']
+    fault_probs = [data['ball'], data['inner'], data['keep'], data['outer']]
+    max_fault_prob = max(fault_probs)
+
+    if ok_prob == max([ok_prob] + fault_probs):
+        status = '正常'
+        status_icon = '🟢'
+    elif max_fault_prob > 0.8:
+        status = '严重'
+        status_icon = '🔴'
+    else:
+        status = '预警'
+        status_icon = '🟡'
+
+    # 4. 健康诊断建议
+    suggestions = []
+    if status == '正常':
+        suggestions = [
+            "当前轴承运行状态良好，建议保持现有的设备巡检频率，每季度进行一次常规维护检查。",
+            "定期监测轴承运行温度和振动数据，建立数据档案，便于后续趋势分析。",
+            "确保轴承润滑条件符合标准，按设备手册要求定期更换润滑脂/润滑油。"
+        ]
+    elif status == '预警':
+        fault_type = max(zip(['滚动体故障', '内圈故障', '保持架故障', '外圈故障'], fault_probs), key=lambda x: x[1])[0]
+        suggestions = [
+            f"检测到{fault_type}概率异常（{max_fault_prob:.6f}），建议增加巡检频次至每周1-2次，重点监测该故障类型相关指标。",
+            "对轴承进行全面的振动检测和温度监测，分析故障发展趋势，评估剩余使用寿命。",
+            "提前准备备用轴承及相关更换工具，制定应急更换预案，防止故障突然恶化。"
+        ]
+    else:  # 严重
+        fault_type = max(zip(['滚动体故障', '内圈故障', '保持架故障', '外圈故障'], fault_probs), key=lambda x: x[1])[0]
+        suggestions = [
+            f"{fault_type}概率已超过80%（{max_fault_prob:.6f}），轴承已处于高故障风险状态，建议立即停机检查并更换轴承。",
+            "更换前需对轴承座、轴颈等配合部件进行检查，确认是否存在磨损、变形等连带损伤。",
+            "分析故障产生的根本原因（如润滑不良、安装偏差、过载运行等），采取针对性措施避免新轴承重复出现同类故障。"
+        ]
+
+    # 5. 生成报告正文
+    analysis_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # 格式化概率分布
+    prob_distribution = "\n".join([f"  {label}: {value:.6f}" for label, value in zip(labels, values)])
+
+    report = f"""================================================================================
+轴承故障分析报告
+================================================================================
+分析时间: {analysis_time}
+
+【预测概率分布】
+--------------------------------------------------------------------------------
+（五分类概率展示）
+{prob_distribution}
+
+【健康状态评估】
+--------------------------------------------------------------------------------
+  状态: {status_icon} {status}  
+  判定规则: 预警=故障概率>正常概率 | 正常=正常概率最大 | 严重=故障概率>0.8
+
+
+【健康诊断】
+--------------------------------------------------------------------------------
+{chr(10).join([f"  {i + 1}. {suggestion}" for i, suggestion in enumerate(suggestions)])}
+
+================================================================================
+报告结束
+================================================================================"""
+
+    return img_path, report
 
 class BearingCNN(nn.Module):
     def __init__(self, input_length, num_classes=5):
@@ -178,7 +297,7 @@ def standalone_prediction(model_path, class_names, file_path):
 
 
 
-def plot_time_series(data, title="时序数据曲线"):
+def plot_time_series(data, title="诊断图"):
     """绘制时序曲线图"""
     plt.figure(figsize=(10, 4))
     # 假设数据包含'timestamp'和'value'列，根据实际格式调整
@@ -214,21 +333,18 @@ def process_input(selected_model_dir):
     model_info = f"模型目录: {selected_model_dir}"
     class_folders = ["ball", "inner", "keep", "ok", "outer"]
 
-
-
     # 检查是否选择了测试文件
     if not selected_preset:
         return None, f"错误: 请先选择一个测试文件\n{preset_info}\n{model_info}"
     else:
         data = pd.read_csv(selected_preset)
-        # 绘制时序曲线图
-        plot_title = f"时序曲线 - {os.path.basename(selected_preset)}"
+        plot_title = f"图 - {os.path.basename(selected_preset)}"
         plot_img = plot_time_series(data, plot_title)
         rs = standalone_prediction(selected_model_dir + '/bearing_fault_5class_model.pth', class_folders,
                                    selected_preset)
+        plot_img,res = generate_bearing_analysis_report(rs)
 
-
-        return plot_img,rs
+        return plot_img,res
 
 
 def set_selected(file_path, buttons, file_paths):
@@ -330,8 +446,8 @@ def create_interface():
                 process_btn = gr.Button("处理", variant="primary")
 
             with gr.Column(scale=2):  # 扩大结果展示区域
-                gr.Markdown("### 时序曲线图")
-                plot_output = gr.Image(label="数据曲线", type="pil")
+                gr.Markdown("### 图")
+                plot_output = gr.Image(label="数据图", type="pil")
 
                 gr.Markdown("### 处理结果")
                 output_text = gr.Textbox(label="预测结果", lines=6)
@@ -359,7 +475,7 @@ def main():
             print(f"警告：无效的端口号参数 '{sys.argv[1]}'，将使用默认端口7860")
 
     demo = create_interface()
-    demo.launch(server_name="0.0.0.0", server_port=port, share=False)
+    demo.launch(allowed_paths=[f'{BASE_DIR}/output'],server_name="0.0.0.0", server_port=port, share=False)
 
 
 if __name__ == "__main__":

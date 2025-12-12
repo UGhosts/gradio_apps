@@ -1,9 +1,23 @@
+crew_rul:
+  #应用中文名
+  name: 轴承寿命预测
+  #应用简介
+  description: 根据轴承运行数据，预测轴承剩余使用寿命（RUL）
+  port: 37700
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: ts_regression
+  #关联数据集目录列表
+  datasets:
+    - /datasets/bearing_rul_datasets
+
 cwru_cls:
   #应用中文名
-  name: 轴承故障诊断
+  name: 轴承故障分类
   #应用简介
-  description: 根据轴承的振动信号，诊断轴承是否存在故障
-  port: 7860
+  description: 根据轴承的振动信号，诊断轴承是否存在故障及故障类型
+  port: 37701
   #是否加载并拉起服务
   load: true
   #关联产线
@@ -11,3 +25,129 @@ cwru_cls:
   #关联数据集目录列表
   datasets:
     - /datasets/cwru_bearing_datasets
+
+ele_metric:
+  #应用中文名
+  name: 电表识别
+  #应用简介
+  description: 识别电表表盘数值，实现电表读数自动化采集
+  port: 37702
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: OCR
+  #关联数据集目录列表
+  datasets:
+    - /datasets/electric_meter_datasets
+
+industrial_meter:
+  #应用中文名
+  name: 工业表读数识别
+  #应用简介
+  description: 识别各类工业仪表（压力表、流量计等）表盘数值
+  port: 37703
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: OCR
+  #关联数据集目录列表
+  datasets:
+    - /datasets/industrial_meter_datasets
+
+air_compressor_cls:
+  #应用中文名
+  name: 空压机故障分类
+  #应用简介
+  description: 分析空压机运行参数，诊断空压机故障类型及故障位置
+  port: 37704
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  datasets:
+    - /datasets/air_compressor_datasets
+
+mp_ocr:
+  #应用中文名
+  name: 工业ocr
+  #应用简介
+  description: 识别工业场景下各类文本（铭牌、报表、工单等）内容
+  port: 37705
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: OCR
+  #关联数据集目录列表
+  datasets:
+    - /datasets/mp_ocr
+
+wendu_prd:
+  #应用中文名
+  name: 温度预测
+  #应用简介
+  description: 根据工业设备运行数据，预测设备关键部位温度变化趋势
+  port: 37706
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: ts_regression
+  #关联数据集目录列表
+  datasets:
+    - /datasets/wendu_prd
+
+zhoucheng_cls:
+  #应用中文名
+  name: 轴承故障分类
+  #应用简介
+  description: 基于多维度传感数据，诊断轴承故障类型及故障程度
+  port: 37707
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  datasets:
+    - /datasets/zhoucheng_cls
+
+dianji_cls:
+  #应用中文名
+  name: 电机故障预测应用
+  #应用简介
+  description: 分析电机电流、振动等数据，预测电机潜在故障及发生概率
+  port: 37708
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: ts_classification
+  #关联数据集目录列表
+  datasets:
+    - /datasets/dianji_cls
+
+belt_det:
+  #应用中文名
+  name: 皮带损伤检测
+  #应用简介
+  description: 通过视觉检测识别传送带表面损伤（撕裂、磨损、开裂等）
+  port: 37709
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: OCR
+  #关联数据集目录列表
+  datasets:
+    - /datasets/belt_damage_datasets
+
+driver_belt_rul:
+  #应用中文名
+  name: 驱动带寿命预测
+  #应用简介
+  description: 分析驱动带运行工况数据，预测驱动带剩余使用寿命
+  port: 37710
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  datasets:
+    - /datasets/driver_belt_rul_datasets
