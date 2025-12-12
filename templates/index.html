@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>风扇噪声分类系统</title>
+    <title>吊扇故障诊断</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,11 +63,16 @@
 </head>
 <body>
     <div class="container">
-        <h1>风扇噪声分类系统</h1>
-        <form method="post" action="/predict" enctype="multipart/form-data">
+        <h1>吊扇故障诊断</h1>
+        <form method="post" action="/predict">
             <div class="form-group">
-                <label for="audio">上传音频文件 (.wav)</label>
-                <input type="file" id="audio" name="audio" accept=".wav" required>
+                <label for="audio_file">选择测试文件 (.wav)</label>
+                <select id="audio_file" name="audio_file" required>
+                    <option value="">-- 请选择文件 --</option>
+                    {% for file in test_files %}
+                    <option value="{{ file }}">{{ file }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <label for="model">选择模型</label>

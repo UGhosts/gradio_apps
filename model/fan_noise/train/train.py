@@ -57,6 +57,32 @@ def extract_dataset():
                 print(f"解压 {zip_file.name} 时出错: {e}")
                 import traceback
                 traceback.print_exc()
+    
+    # 检查是否存在data/train/abnormal和data/train/normal目录结构
+    train_abnormal_path = OUTPUT_PATH / "data" / "train" / "abnormal"
+    train_normal_path = OUTPUT_PATH / "data" / "train" / "normal"
+    
+    if train_abnormal_path.exists() and train_normal_path.exists():
+        print("检测到data/train/abnormal和data/train/normal目录结构")
+        print("将abnormal和normal目录移动到data目录下")
+        
+        # 将abnormal和normal目录移动到data目录下
+        import shutil
+        if (OUTPUT_PATH / "data" / "abnormal").exists():
+            shutil.rmtree(str(OUTPUT_PATH / "data" / "abnormal"))
+        if (OUTPUT_PATH / "data" / "normal").exists():
+            shutil.rmtree(str(OUTPUT_PATH / "data" / "normal"))
+        
+        shutil.move(str(train_abnormal_path), str(OUTPUT_PATH / "data"))
+        shutil.move(str(train_normal_path), str(OUTPUT_PATH / "data"))
+        
+        # 删除空的train目录
+        if (OUTPUT_PATH / "data" / "train").exists() and not list((OUTPUT_PATH / "data" / "train").iterdir()):
+            (OUTPUT_PATH / "data" / "train").rmdir()
+            print("删除空的train目录")
+        
+        print("目录结构调整完成")
+    
     print("所有数据集解压完成")
 
 # 转换音频格式为单声道
@@ -125,6 +151,13 @@ def train_model():
     # 按字母顺序排序类别目录（确保一致性）
     class_dirs.sort()
     print(f"发现类别: {[os.path.basename(d) for d in class_dirs]}")
+    
+    # 检查每个类别目录下的音频文件数量
+    for class_dir in class_dirs:
+        audio_files = list(pathlib.Path(class_dir).glob("*.wav"))
+        print(f"类别 {os.path.basename(class_dir)} 包含 {len(audio_files)} 个音频文件")
+        if len(audio_files) == 0:
+            print(f"警告: 类别 {os.path.basename(class_dir)} 目录下没有音频文件")
     
     # 训练参数
     window_size = 1.0
@@ -254,6 +287,14 @@ def main():
     try:
         # 创建目录
         create_directories()
+        
+        # 清理data目录，以便重新解压
+        data_path = OUTPUT_PATH / "data"
+        if data_path.exists():
+            print("清理现有的data目录...")
+            shutil.rmtree(str(data_path))
+            data_path.mkdir()
+            print("data目录清理完成")
         
         # 解压数据集
         extract_dataset()
