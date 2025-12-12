@@ -412,7 +412,7 @@ def create_interface():
                 process_btn = gr.Button("处理", variant="primary")
 
             with gr.Column(scale=2):  # 扩大结果展示区域
-                gr.Markdown("### 原始振动信号图")
+                gr.Markdown("### 振动信号分析图")
                 plot_output = gr.Image(label="数据曲线", type="pil")
 
                 gr.Markdown("### 处理结果")
