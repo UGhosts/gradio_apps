@@ -467,8 +467,8 @@ def create_interface():
             if os.path.isdir(item_path):
                 model_options.append((item, item_path))
 
-    with gr.Blocks(title="涂胶机综合诊断应用") as demo:
-        gr.Markdown("# 🚀 涂胶机综合诊断应用")
+    with gr.Blocks(title="涂布机综合诊断应用") as demo:
+        gr.Markdown("# 🚀 涂布机综合诊断应用")
 
         with gr.Row():
             with gr.Column(scale=1):
