@@ -19,13 +19,11 @@ app.template_folder = templates_dir
 MODEL_DIR = os.path.join(BASE_DIR, "model", "fan_noise", "train", "models")
 LABEL_MAPPING = {0: "异常噪声", 1: "正常噪声"}
 
-# 设置上传文件的目录
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "temp_uploads")
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB限制
+# 设置测试文件目录
+TEST_FILES_DIR = os.path.join(BASE_DIR, "dataset", "fan_noise_test")
+if not os.path.exists(TEST_FILES_DIR):
+    os.makedirs(TEST_FILES_DIR)
+    print(f"已创建测试文件目录: {TEST_FILES_DIR}")
 
 # 加载可用模型
 def load_models():
@@ -35,6 +33,15 @@ def load_models():
             if "model" in file and not file.endswith("MEANS"):
                 models.append(file)
     return models
+
+# 加载测试文件
+def load_test_files():
+    test_files = []
+    if os.path.exists(TEST_FILES_DIR):
+        for file in os.listdir(TEST_FILES_DIR):
+            if file.endswith(".wav"):
+                test_files.append(file)
+    return test_files
 
 # 预测函数
 def predict(audio_path, model_name):
@@ -149,38 +156,36 @@ def predict(audio_path, model_name):
 @app.route('/')
 def index():
     models = load_models()
-    return render_template('index.html', models=models)
+    test_files = load_test_files()
+    return render_template('index.html', models=models, test_files=test_files)
 
-# 处理文件上传和预测
+# 处理文件选择和预测
 @app.route('/predict', methods=['POST'])
 def predict_route():
-    if 'audio' not in request.files or request.form.get('model') is None:
+    if 'audio_file' not in request.form or request.form.get('model') is None:
         return redirect(url_for('index'))
     
-    audio = request.files['audio']
+    selected_file = request.form.get('audio_file')
     model_name = request.form.get('model')
     
-    if audio.filename == '':
+    if selected_file == '':
         return redirect(url_for('index'))
     
-    if audio and audio.filename.endswith('.wav'):
-        # 保存文件
-        filename = audio.filename
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        audio.save(file_path)
-        
+    # 从固定目录获取文件
+    file_path = os.path.join(TEST_FILES_DIR, selected_file)
+    
+    if os.path.exists(file_path) and file_path.endswith('.wav'):
         # 添加详细的调试信息
-        print(f"\n=== 处理文件: {filename} (模型: {model_name}) ===")
+        print(f"\n=== 处理文件: {selected_file} (模型: {model_name}) ===")
+        print(f"文件路径: {file_path}")
         print(f"文件大小: {os.path.getsize(file_path)} bytes")
         
         # 进行预测
         result = predict(file_path, model_name)
         
-        # 删除临时文件
-        os.remove(file_path)
-        
         models = load_models()
-        return render_template('index.html', models=models, result=result, audio_name=filename)
+        test_files = load_test_files()
+        return render_template('index.html', models=models, test_files=test_files, result=result, audio_name=selected_file)
     
     return redirect(url_for('index'))
 
@@ -193,7 +198,7 @@ def get_template():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>风扇噪声分类系统</title>
+    <title>吊扇故障诊断</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -252,11 +257,16 @@ def get_template():
 </head>
 <body>
     <div class="container">
-        <h1>风扇噪声分类系统</h1>
-        <form method="post" action="/predict" enctype="multipart/form-data">
+        <h1>吊扇故障诊断</h1>
+        <form method="post" action="/predict">
             <div class="form-group">
-                <label for="audio">上传音频文件 (.wav)</label>
-                <input type="file" id="audio" name="audio" accept=".wav" required>
+                <label for="audio_file">选择测试文件 (.wav)</label>
+                <select id="audio_file" name="audio_file" required>
+                    <option value="">-- 请选择文件 --</option>
+                    {% for file in test_files %}
+                    <option value="{{ file }}">{{ file }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <label for="model">选择模型</label>
