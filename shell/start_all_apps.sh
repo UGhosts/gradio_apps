@@ -41,6 +41,7 @@ declare -a APPS=(
     "gangyin_ocr:37712"
     "tujiaoji_cls:37713"
     "tubuji_com:37714"
+    "duanmo_prd:37715"
 )    
 # 存储所有应用的 PID
 declare -A APP_PIDS
