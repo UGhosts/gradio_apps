@@ -42,6 +42,7 @@ declare -a APPS=(
     "tujiaoji_cls:37713"
     "tubuji_com:37714"
     "duanmo_prd:37715"
+    "centrifugal_fault_det:37716"
 )    
 # 存储所有应用的 PID
 declare -A APP_PIDS
