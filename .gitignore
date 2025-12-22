@@ -101,3 +101,4 @@ model/*/train_dataset/*
 *.pybak
 model/air_compressor/data/*
 model/driver_belt_rul/data/*
+model/centrifugal_fault_det/data/*
