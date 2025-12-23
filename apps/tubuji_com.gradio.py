@@ -521,7 +521,7 @@ def create_interface():
                 process_btn = gr.Button("处理", variant="primary")
 
             with gr.Column(scale=2):
-                gr.Markdown("### 时序曲线图")
+                gr.Markdown("### 数据处理图")
                 plot_output = gr.Image(label="数据曲线", type="pil")
 
                 gr.Markdown("### 处理结果")
