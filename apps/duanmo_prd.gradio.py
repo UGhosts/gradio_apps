@@ -21,6 +21,7 @@ import warnings
 import joblib
 import os
 
+os.makedirs(f'{BASE_DIR}/output/duanmo_prd/', exist_ok=True)
 
 def generate_membrane_report(excel_path, save_image_path=None):
     # -------------------------- 初始化配置 --------------------------
