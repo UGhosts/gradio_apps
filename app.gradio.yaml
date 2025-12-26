@@ -82,7 +82,7 @@ air_compressor_cls:
 
 mp_ocr:
   #应用中文名
-  name: 工业ocr
+  name: 工业铭牌ocr
   #应用简介
   description: 识别工业场景下各类文本（铭牌、报表、工单等）内容
   port: 37705
@@ -90,9 +90,11 @@ mp_ocr:
   load: true
   #关联产线
   pipelines: OCR
-  #关联数据集目录列表
-  datasets:
-    - /datasets/mp_ocr
+    #关联数据集目录列表
+  fine-tuning-list:
+    - model: PP-OCRv5_mobile_det
+      datasets: 工业ocr识别数据集
+      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
 
 wendu_prd:
   #应用中文名
@@ -105,8 +107,10 @@ wendu_prd:
   #关联产线
   pipelines: ts_forecast
   #关联数据集目录列表
-  datasets:
-    - /datasets/wendu_prd
+  fine-tuning-list:
+    - model: DLinear
+      datasets: 温度预测时序数据集
+      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/wendu_prd/model/inference.pdiparams
 
 zhoucheng_cls:
   #应用中文名
@@ -133,8 +137,10 @@ dianji_cls:
   #关联产线
   pipelines: ts_classification
   #关联数据集目录列表
-  datasets:
-    - /datasets/dianji_cls
+  fine-tuning-list:
+    - model: TimesNet_cls
+      datasets: 电机预测时序数据集
+      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/dianji_cls/model/inference.pdiparams
 
 belt_det:
   #应用中文名
@@ -177,10 +183,12 @@ chilun_cls:
   #是否加载并拉起服务
   load: true
   #关联产线
-  pipelines: None
-  #关联数据集目录列表
-  datasets:
-    - /datasets/chilun_cls
+  pipelines: ts_classification
+    #关联数据集目录列表
+  fine-tuning-list:
+    - model: TimesNet_cls
+      datasets: 齿轮箱震动数据集
+      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/chilun_cls/model/inference.pdiparams
 
 gangyin_ocr:
   #应用中文名
@@ -190,11 +198,13 @@ gangyin_ocr:
   port: 37712
   #是否加载并拉起服务
   load: true
-  #关联产线
-  pipelines: None
   #关联数据集目录列表
-  datasets:
-    - /datasets/gangyin_ocr
+  pipelines: OCR
+      #关联数据集目录列表
+    fine-tuning-list:
+      - model: PP-OCRv5_mobile_det
+        datasets: 工业ocr识别数据集
+        params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
 
 tujiaoji_cls:
   #应用中文名
@@ -207,8 +217,10 @@ tujiaoji_cls:
   #关联产线
   pipelines: None
   #关联数据集目录列表
-  datasets:
-    - /datasets/tujiaoji_cls
+  fine-tuning-list:
+    - model: PP-LCNet_x1_0
+      datasets: 涂胶机视觉数据集
+      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/tujiaoji_cls/model/inference.pdiparams
 
 tubuji_com:
   #应用中文名
