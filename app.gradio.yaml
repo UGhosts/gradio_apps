@@ -7,24 +7,27 @@ crew_rul:
   #是否加载并拉起服务
   load: true
   #关联产线
-  pipelines: ts_regression
+  pipelines: None
   #关联数据集目录列表
-  datasets:
-    - /datasets/bearing_rul_datasets
+  fine-tuning-list:
+    - model: TCN_rul
+      datasets: 轴承寿命预测数据集
+      params: /nfs/dubhe-prod/model-opt/qh/crew_rul/model
 
 cwru_cls:
   #应用中文名
-  name: 轴承故障分类
+  name: 轴承故障诊断
   #应用简介
-  description: 根据轴承的振动信号，诊断轴承是否存在故障及故障类型
-  port: 37701
+  description: 根据轴承的振动信号，诊断轴承是否存在故障
+  port: 7860
   #是否加载并拉起服务
   load: true
   #关联产线
   pipelines: ts_classification
-  #关联数据集目录列表
-  datasets:
-    - /datasets/cwru_bearing_datasets
+  fine-tuning-list:
+    - model: TimesNet_cls
+      datasets: 轴承故障分类数据集
+      params: /nfs/dubhe-prod/model-opt/qh/cwru_cls/model
 
 ele_metric:
   #应用中文名
@@ -37,8 +40,10 @@ ele_metric:
   #关联产线
   pipelines: OCR
   #关联数据集目录列表
-  datasets:
-    - /datasets/electric_meter_datasets
+  fine-tuning-list:
+    - model: PP-OCRv5_mobile_det
+      datasets: 电表OCR数据集
+      params: /nfs/dubhe-prod/model-opt/qh/ele_metric_ocr/model/PP-OCRv5_mobile_det/inference.pdiparams
 
 industrial_meter:
   #应用中文名
@@ -51,8 +56,13 @@ industrial_meter:
   #关联产线
   pipelines: OCR
   #关联数据集目录列表
-  datasets:
-    - /datasets/industrial_meter_datasets
+  fine-tuning-list:
+    - model: PP-YOLOE_plus-S
+      datasets: 工业表图像语义分割数据集
+      params: /nfs/dubhe-prod/model-opt/qh/industrail_metric_det/model/PP-YOLOE_plus-S/inference.pdiparams
+    - model: SegFormer-B1
+      datasets: 工业表图像语义分割数据集
+      params: /nfs/dubhe-prod/model-opt/qh/industrail_metric_det/model/SegFormer-B1/inference.pdiparams
 
 air_compressor_cls:
   #应用中文名
@@ -65,8 +75,10 @@ air_compressor_cls:
   #关联产线
   pipelines: None
   #关联数据集目录列表
-  datasets:
-    - /datasets/air_compressor_datasets
+  fine-tuning-list:
+    - model: LightGBM
+      datasets: 空压机故障分类数据集
+      params: /nfs/dubhe-prod/model-opt/qh/air_compressor/model
 
 mp_ocr:
   #应用中文名
@@ -91,7 +103,7 @@ wendu_prd:
   #是否加载并拉起服务
   load: true
   #关联产线
-  pipelines: ts_regression
+  pipelines: ts_forecast
   #关联数据集目录列表
   datasets:
     - /datasets/wendu_prd
@@ -135,8 +147,10 @@ belt_det:
   #关联产线
   pipelines: OCR
   #关联数据集目录列表
-  datasets:
-    - /datasets/belt_damage_datasets
+  fine-tuning-list:
+    - model: PP-YOLOE_plus-M
+      datasets: 传送带故障数据集
+      params: /nfs/dubhe-prod/model-opt/qh/belt_det/model/PP-YOLOE_plus-M/inference.pdiparams
 
 driver_belt_rul:
   #应用中文名
@@ -149,8 +163,10 @@ driver_belt_rul:
   #关联产线
   pipelines: None
   #关联数据集目录列表
-  datasets:
-    - /datasets/driver_belt_rul_datasets
+  fine-tuning-list:
+    - model: TCN+Attention
+      datasets: 驱动带寿命预测数据集
+      params: /nfs/dubhe-prod/model-opt/qh/driver_belt_rul/model/TCN+Attention
 
 chilun_cls:
   #应用中文名
@@ -221,3 +237,19 @@ duanmo_prd:
   #关联数据集目录列表
   datasets:
     - /datasets/duanmo_prd
+
+centrifugal_fault_det:
+  #应用中文名
+  name: 离心故障检测
+  #应用简介
+  description: 分析离心机工况数据，预测离心机是否存在故障
+  port: 37716
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  fine-tuning-list:
+    - model: TCN+Attention
+      datasets: 离心机故障数据集
+      params: /nfs/dubhe-prod/model-opt/qh/centrifugal_fault_det/model/best_model.pdparams
