@@ -98,7 +98,7 @@ wendu_prd:
 
 zhoucheng_cls:
   #应用中文名
-  name: 轴承故障分类
+  name: 轴承故障检测综合应用
   #应用简介
   description: 基于多维度传感数据，诊断轴承故障类型及故障程度
   port: 37707
@@ -151,3 +151,73 @@ driver_belt_rul:
   #关联数据集目录列表
   datasets:
     - /datasets/driver_belt_rul_datasets
+
+chilun_cls:
+  #应用中文名
+  name: 齿轮箱故障预测应用
+  #应用简介
+  description: 分析齿轮箱运行震动数据，预测齿轮箱是否有故障
+  port: 37711
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  datasets:
+    - /datasets/chilun_cls
+
+gangyin_ocr:
+  #应用中文名
+  name: 钢印ocr识别应用
+  #应用简介
+  description: 针对钢印码优化ocr识别准确率，达到快速、精准效果
+  port: 37712
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  datasets:
+    - /datasets/gangyin_ocr
+
+tujiaoji_cls:
+  #应用中文名
+  name: 涂胶机视觉检测应用
+  #应用简介
+  description: 针对涂胶机涂胶效果的视觉图片，判断此次检测是NG还是OK
+  port: 37713
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  datasets:
+    - /datasets/tujiaoji_cls
+
+tubuji_com:
+  #应用中文名
+  name: 涂布机综合诊断应用
+  #应用简介
+  description: 对涂布机机头加12节烘箱数据，准实时检测并提供总结性报告内容
+  port: 37714
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  datasets:
+    - /datasets/tubuji_com
+
+duanmo_prd:
+  #应用中文名
+  name: 断膜检测与诊断综合应用
+  #应用简介
+  description: 对生产产线的历史断膜时序数据，通过训练和打标，实现提前一小时告警并提供诊断依据
+  port: 37715
+  #是否加载并拉起服务
+  load: true
+  #关联产线
+  pipelines: None
+  #关联数据集目录列表
+  datasets:
+    - /datasets/duanmo_prd
