@@ -201,10 +201,10 @@ gangyin_ocr:
   #关联数据集目录列表
   pipelines: OCR
       #关联数据集目录列表
-    fine-tuning-list:
-      - model: PP-OCRv5_mobile_det
-        datasets: 工业ocr识别数据集
-        params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
+  fine-tuning-list:
+    - model: PP-OCRv5_mobile_det
+      datasets: 工业ocr识别数据集
+      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
 
 tujiaoji_cls:
   #应用中文名
