@@ -298,8 +298,8 @@ def get_template():
 </html>
 '''
 
-# 运行应用
-if __name__ == "__main__":
+# 启动应用函数，接受port参数
+def launch_app(port=5000):
     # 为了简化部署，我们将HTML直接嵌入到代码中
     # 创建templates目录
     templates_dir = os.path.join(BASE_DIR, "templates")
@@ -311,5 +311,16 @@ if __name__ == "__main__":
         f.write(app.view_functions['get_template']())
     
     print("Flask应用启动中...")
-    print(f"访问地址: http://127.0.0.1:5000")
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    print(f"访问地址: http://127.0.0.1:{port}")
+    app.run(host="127.0.0.1", port=port, debug=True)
+
+# 运行应用
+if __name__ == "__main__":
+    import sys
+    port = 5000
+    if len(sys.argv) > 1:
+        try:
+            port = int(sys.argv[1])
+        except ValueError:
+            print("端口号必须是数字，使用默认端口5000")
+    launch_app(port=port)
