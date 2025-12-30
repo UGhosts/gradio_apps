@@ -12,7 +12,7 @@ crew_rul:
   fine-tuning-list:
     - model: TCN_rul
       datasets: 轴承寿命预测数据集
-      params: /nfs/dubhe-prod/model-opt/qh/crew_rul/model
+      params: crew_rul_model
 
 cwru_cls:
   #应用中文名
@@ -27,7 +27,7 @@ cwru_cls:
   fine-tuning-list:
     - model: TimesNet_cls
       datasets: 轴承故障分类数据集
-      params: /nfs/dubhe-prod/model-opt/qh/cwru_cls/model
+      params: TimesNet_cls_cwru_cls.pdiparams
 
 ele_metric:
   #应用中文名
@@ -43,7 +43,7 @@ ele_metric:
   fine-tuning-list:
     - model: PP-OCRv5_mobile_det
       datasets: 电表OCR数据集
-      params: /nfs/dubhe-prod/model-opt/qh/ele_metric_ocr/model/PP-OCRv5_mobile_det/inference.pdiparams
+      params: PP-OCRv5_mobile_det_ele_metric.pdiparams
 
 industrial_meter:
   #应用中文名
@@ -59,10 +59,10 @@ industrial_meter:
   fine-tuning-list:
     - model: PP-YOLOE_plus-S
       datasets: 工业表图像语义分割数据集
-      params: /nfs/dubhe-prod/model-opt/qh/industrail_metric_det/model/PP-YOLOE_plus-S/inference.pdiparams
+      params: PP-YOLOE_plus-S_industrial_meter.pdiparams
     - model: SegFormer-B1
       datasets: 工业表图像语义分割数据集
-      params: /nfs/dubhe-prod/model-opt/qh/industrail_metric_det/model/SegFormer-B1/inference.pdiparams
+      params: SegFormer-B1_industrial_meter.pdiparams
 
 air_compressor_cls:
   #应用中文名
@@ -78,7 +78,7 @@ air_compressor_cls:
   fine-tuning-list:
     - model: LightGBM
       datasets: 空压机故障分类数据集
-      params: /nfs/dubhe-prod/model-opt/qh/air_compressor/model
+      params: LightGBM_air_compressor_cls
 
 mp_ocr:
   #应用中文名
@@ -94,7 +94,7 @@ mp_ocr:
   fine-tuning-list:
     - model: PP-OCRv5_mobile_det
       datasets: 工业ocr识别数据集
-      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
+      params: ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
 
 wendu_prd:
   #应用中文名
@@ -110,7 +110,7 @@ wendu_prd:
   fine-tuning-list:
     - model: DLinear
       datasets: 温度预测时序数据集
-      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/wendu_prd/model/inference.pdiparams
+      params: wendu_prd/model/inference.pdiparams
 
 zhoucheng_cls:
   #应用中文名
@@ -140,7 +140,7 @@ dianji_cls:
   fine-tuning-list:
     - model: TimesNet_cls
       datasets: 电机预测时序数据集
-      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/dianji_cls/model/inference.pdiparams
+      params: dianji_cls/model/inference.pdiparams
 
 belt_det:
   #应用中文名
@@ -156,7 +156,7 @@ belt_det:
   fine-tuning-list:
     - model: PP-YOLOE_plus-M
       datasets: 传送带故障数据集
-      params: /nfs/dubhe-prod/model-opt/qh/belt_det/model/PP-YOLOE_plus-M/inference.pdiparams
+      params: belt_det/model/PP-YOLOE_plus-M/inference.pdiparams
 
 driver_belt_rul:
   #应用中文名
@@ -172,7 +172,7 @@ driver_belt_rul:
   fine-tuning-list:
     - model: TCN+Attention
       datasets: 驱动带寿命预测数据集
-      params: /nfs/dubhe-prod/model-opt/qh/driver_belt_rul/model/TCN+Attention
+      params: TCN+Attention_driver_belt_rul
 
 chilun_cls:
   #应用中文名
@@ -188,7 +188,7 @@ chilun_cls:
   fine-tuning-list:
     - model: TimesNet_cls
       datasets: 齿轮箱震动数据集
-      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/chilun_cls/model/inference.pdiparams
+      params: chilun_cls/model/inference.pdiparams
 
 gangyin_ocr:
   #应用中文名
@@ -204,7 +204,7 @@ gangyin_ocr:
   fine-tuning-list:
     - model: PP-OCRv5_mobile_det
       datasets: 工业ocr识别数据集
-      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
+      params: ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
 
 tujiaoji_cls:
   #应用中文名
@@ -220,7 +220,7 @@ tujiaoji_cls:
   fine-tuning-list:
     - model: PP-LCNet_x1_0
       datasets: 涂胶机视觉数据集
-      params: /nfs/dubhe-storage/dubhe-prod/model-opt/qh/tujiaoji_cls/model/inference.pdiparams
+      params: tujiaoji_cls/model/inference.pdiparams
 
 tubuji_com:
   #应用中文名
@@ -263,5 +263,5 @@ centrifugal_fault_det:
   #关联数据集目录列表
   fine-tuning-list:
     - model: TCN+Attention
-      datasets: 离心机故障数据集
-      params: /nfs/dubhe-prod/model-opt/qh/centrifugal_fault_det/model/best_model.pdparams
+      datasets: 离心机故障数据集  
+      params: TCN+Attention_centrifugal_fault_det.pdparams
