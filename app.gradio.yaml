@@ -94,7 +94,7 @@ mp_ocr:
   fine-tuning-list:
     - model: PP-OCRv5_mobile_det
       datasets: 工业ocr识别数据集
-      params: ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
+      params: PP-OCRv5_mobile_det_mp_ocr.pdiparams
 
 wendu_prd:
   #应用中文名
@@ -110,7 +110,7 @@ wendu_prd:
   fine-tuning-list:
     - model: DLinear
       datasets: 温度预测时序数据集
-      params: wendu_prd/model/inference.pdiparams
+      params: DLinear_wendu_prd.pdiparams
 
 zhoucheng_cls:
   #应用中文名
@@ -140,7 +140,7 @@ dianji_cls:
   fine-tuning-list:
     - model: TimesNet_cls
       datasets: 电机预测时序数据集
-      params: dianji_cls/model/inference.pdiparams
+      params: TimesNet_cls_dianji_cls.pdiparams
 
 belt_det:
   #应用中文名
@@ -188,7 +188,7 @@ chilun_cls:
   fine-tuning-list:
     - model: TimesNet_cls
       datasets: 齿轮箱震动数据集
-      params: chilun_cls/model/inference.pdiparams
+      params: TimesNet_cls_chilun_cls.pdiparams
 
 gangyin_ocr:
   #应用中文名
@@ -204,7 +204,7 @@ gangyin_ocr:
   fine-tuning-list:
     - model: PP-OCRv5_mobile_det
       datasets: 工业ocr识别数据集
-      params: ocr/model/ocr_model/PP-OCRv5_mobile_det_infer/inference.pdiparams
+      params: PP-OCRv5_mobile_det_gangyin_ocr.pdiparams
 
 tujiaoji_cls:
   #应用中文名
@@ -220,7 +220,7 @@ tujiaoji_cls:
   fine-tuning-list:
     - model: PP-LCNet_x1_0
       datasets: 涂胶机视觉数据集
-      params: tujiaoji_cls/model/inference.pdiparams
+      params: PP-LCNet_x1_0_tujiaoji_cls.pdiparams
 
 tubuji_com:
   #应用中文名
