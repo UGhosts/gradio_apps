@@ -6,6 +6,7 @@ import sys
 import os
 import json
 import matplotlib.pyplot as plt
+from paddlex import create_model
 
 from pathlib import Path
 BASE_DIR = Path(__file__).parent.parent
@@ -280,7 +281,7 @@ def analyze_gearbox_vibration(csv_path, save_dir="./"):
 
 
 def process_input(selected_model_dir):
-    from paddlex import create_model
+
 
     """处理全局选中的测试文件，返回图表和结果"""
     time.sleep(1)
