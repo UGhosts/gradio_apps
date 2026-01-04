@@ -4,7 +4,6 @@ from datetime import datetime
 import gradio as gr
 import time
 import os
-from paddlex import create_model
 import sys
 import csv
 selected_preset = None
