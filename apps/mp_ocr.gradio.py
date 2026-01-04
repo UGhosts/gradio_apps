@@ -10,6 +10,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import io
+from paddlex import create_model
 
 # 解决中文显示问题
 #plt.rcParams["font.family"] = ["SimHei", "WenQuanYi Micro Hei", "Heiti TC"]
@@ -103,7 +104,7 @@ def preprocess_image(image_path):
 
 
 def process_input(selected_model_dir):
-    from paddlex import create_model
+
 
     """处理全局选中的测试文件，返回图表和结果"""
     time.sleep(1)
