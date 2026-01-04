@@ -21,7 +21,7 @@ detector_instance = None
 BASE_DIR = Path(__file__).parent.parent
 MODEL_BASE_DIR = BASE_DIR / "model" / "belt_det" / "model"
 RESTART_SIGNAL_FILENAME = ".restart_signal_belt_det"
-EXAMPLE_DIR = BASE_DIR / "model" / "belt_det" / "example"
+EXAMPLE_DIR = BASE_DIR / "dataset" / "belt_det"
 OUTPUT_DIR = BASE_DIR / "model" / "belt_det" / "output"
 
 # 确保输出目录存在

@@ -312,7 +312,7 @@ def launch_app(port=5000):
     
     print("Flask应用启动中...")
     print(f"访问地址: http://127.0.0.1:{port}")
-    app.run(host="127.0.0.1", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True)
 
 # 运行应用
 if __name__ == "__main__":
