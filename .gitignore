@@ -93,7 +93,7 @@ $RECYCLE.BIN/
 .restart*
 PaddleX/
 PaddleOCR/*
-dataset/*
+# dataset/*
 model/*/output/*
 model/*/dataset/*
 model/*/train_dataset/*

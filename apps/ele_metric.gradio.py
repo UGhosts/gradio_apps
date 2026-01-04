@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 BASE_DIR = Path(__file__).parent.parent
 MODEL_BASE_DIR = BASE_DIR / "model" / "ele_metric_ocr" / "model"
 RESTART_SIGNAL_FILENAME = ".restart_signal_ele_metric"
-EXAMPLE_DIR = BASE_DIR / "model" / "ele_metric_ocr" / "example"
+EXAMPLE_DIR = BASE_DIR / "dataset" / "ele_metric_ocr"
 
 
 model_options = util.generate_paddlex_model_options(MODEL_BASE_DIR)

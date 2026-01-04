@@ -42,8 +42,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parent.parent
 MODEL_BASE_DIR = BASE_DIR / "model" / "industrail_metric_det" / "model"
 RESTART_SIGNAL_FILENAME = ".restart_signal_industrai_meter"
-EXAMPLE_DIR = BASE_DIR / "model" / "industrail_metric_det" / "example"
-
+EXAMPLE_DIR = BASE_DIR / "dataset" / "industrail_metric_det"
 
 class MeterReader:
     def __init__(self, detector_dir, segmenter_dir):
