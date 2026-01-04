@@ -12,6 +12,7 @@ from scipy.fft import fft, fftfreq
 from scipy.stats import kurtosis
 import numpy as np
 import pandas as pd
+from paddlex import create_model
 
 BASE_DIR = Path(__file__).parent.parent
 from utils.app_utils import AppUtils as util
@@ -367,7 +368,7 @@ def vibration_analysis_core(csv_path,savepath):
 
 
 def process_input(selected_model_dir):
-    from paddlex import create_model
+
 
     """处理全局选中的测试文件，返回图表和结果"""
     time.sleep(1)
