@@ -260,7 +260,7 @@ def create_interface():
 
             with gr.Column(scale=2):  # 扩大结果展示区域
                 gr.Markdown("### ocr查看")
-                plot_output = gr.Image(label="视图", type="pil", height=500, width=900)
+                plot_output = gr.Image(label="视图", type="pil", height=500, width=900,buttons=['fullscreen'])
 
                 gr.Markdown("### 处理结果")
                 output_text = gr.Textbox(label="预测结果", lines=6)

@@ -21,11 +21,11 @@ plt = util.auto_config_chinese_font()
 # ============================================================
 # 配置路径 (请确保与训练脚本一致)
 # ============================================================
-BASE_DIR = Path(__file__).parent.parent / "model" / "centrifugal_fault_det"
-MODEL_PATH = BASE_DIR / "model" / "final_model.pdparams" 
-PARAMS_PATH = BASE_DIR / "model" / "X_train_params.npz"
-DATA_DIR = BASE_DIR / "data"
-EXAMPLE_DIR = BASE_DIR / "example"  # 样例数据目录
+BASE_DIR = Path(__file__).parent.parent
+MODEL_PATH = BASE_DIR  / "model" / "centrifugal_fault_det"/"model" / "final_model.pdparams" 
+PARAMS_PATH = BASE_DIR  / "model" / "centrifugal_fault_det"/"model" / "X_train_params.npz"
+DATA_DIR = BASE_DIR / "model" / "centrifugal_fault_det"/ "model" / "centrifugal_fault_det"
+EXAMPLE_DIR = BASE_DIR /"dataset"/"centrifugal_fault_det"
 
 # ============================================================
 # 故障定义
@@ -601,8 +601,8 @@ def create_gradio_interface():
                     result_summary = gr.Textbox(label="诊断概要", lines=10, interactive=False)
                     
                     with gr.Row():
-                        distribution_chart = gr.Image(label="故障分布分析", height=350)
-                        confidence_chart = gr.Image(label="置信度分析", height=350)
+                        distribution_chart = gr.Image(label="故障分布分析", height=350,buttons=['fullscreen'])
+                        confidence_chart = gr.Image(label="置信度分析", height=350,buttons=['fullscreen'])
                     
                     fault_report = gr.Textbox(label="详细故障分析报告", lines=30, interactive=False)
         

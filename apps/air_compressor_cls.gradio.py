@@ -895,8 +895,6 @@ def predict_from_csv(csv_file, model_name, simulated_file_name):
         result_summary = f"📊 故障诊断完成\n\n"
         result_summary += f"数据来源: {data_source}\n"
         result_summary += f"样本总数: {len(df)}\n"
-        result_summary += f"预测文件: {output_path}\n"
-        result_summary += f"分析报告: {report_path}\n"
         
         return result_summary, report_text, distribution_chart
         
@@ -1101,7 +1099,7 @@ def create_gradio_interface():
                     result_summary = gr.Textbox(label="诊断概要", lines=6, interactive=False)
                     
                     with gr.Row():
-                        distribution_chart = gr.Image(label="故障分布分析", height=400)
+                        distribution_chart = gr.Image(label="故障分布分析", height=400,buttons=['fullscreen'])
                     
                     fault_report = gr.Textbox(label="详细故障分析报告", lines=25, interactive=False)
         
@@ -1183,7 +1181,7 @@ def create_gradio_interface():
                     sim_result_file = gr.Textbox(label="结果文件路径", interactive=False)
                     sim_result_text = gr.Textbox(label="模拟统计", lines=10, interactive=False)
                     
-                    sim_viz_output = gr.Image(label="特征分布可视化", height=500)
+                    sim_viz_output = gr.Image(label="特征分布可视化", height=500,buttons=['fullscreen'])
         
         # 刷新模拟数据列表
         def refresh_simulated_files():

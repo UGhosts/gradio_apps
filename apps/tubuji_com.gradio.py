@@ -522,7 +522,7 @@ def create_interface():
 
             with gr.Column(scale=2):
                 gr.Markdown("### 数据处理图")
-                plot_output = gr.Image(label="数据曲线", type="pil")
+                plot_output = gr.Image(label="数据曲线", type="pil",buttons=['fullscreen'])
 
                 gr.Markdown("### 处理结果")
                 output_text = gr.Textbox(label="结果信息", lines=10, interactive=False)

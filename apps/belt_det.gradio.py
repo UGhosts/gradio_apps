@@ -424,7 +424,7 @@ def create_gradio_interface():
                             image_clear_btn = gr.Button("🗑️ 清空", variant="secondary")
                         
                         gr.Markdown("### 📋 检测结果")
-                        output_image = gr.Image(label="检测结果", height=500)
+                        output_image = gr.Image(label="检测结果", height=500,buttons=['fullscreen'])
                         image_status = gr.Textbox(label="检测信息", lines=3, interactive=False)
                     
                     # 视频检测标签页
