@@ -626,7 +626,7 @@ def create_interface():
                 result_plot = gr.Image(
                     label="健康状态仪表盘",
                     type="pil",
-                    height=500
+                    height=500,buttons=['fullscreen']
                 )
                 
                 gr.Markdown("### 📋 详细报告")

@@ -482,7 +482,8 @@ def create_gradio_interface():
                 output_image = gr.Image(
                     label="检测结果图片", 
                     height=400,
-                    show_label=True
+                    show_label=True,
+                    buttons=['fullscreen']
                 )
                 
                 # 结果摘要

@@ -414,7 +414,7 @@ def create_interface():
 
             with gr.Column(scale=2):  # 扩大结果展示区域
                 gr.Markdown("### 振动信号分析图")
-                plot_output = gr.Image(label="数据曲线", type="pil")
+                plot_output = gr.Image(label="数据曲线", type="pil",buttons=['fullscreen'])
 
                 gr.Markdown("### 处理结果")
                 output_text = gr.Textbox(label="预测结果", lines=6)

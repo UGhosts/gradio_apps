@@ -390,7 +390,7 @@ def create_gradio_interface():
                     clear_btn = gr.Button("🗑️ 清空", variant="secondary")
                 
                 gr.Markdown("### 📋 识别结果")
-                output_image = gr.Image(label="识别结果可视化", height=600)
+                output_image = gr.Image(label="识别结果可视化", height=600,buttons=['fullscreen'])
                 result_status = gr.Textbox(label="识别结果", interactive=False)
 
         # 事件绑定

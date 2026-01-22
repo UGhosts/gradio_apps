@@ -134,7 +134,7 @@ def create_interface():
 
             with gr.Column(scale=2):  # 扩大结果展示区域
                 gr.Markdown("### 视图查看")
-                plot_output = gr.Image(label="视图", type="pil",height=400,width=700)
+                plot_output = gr.Image(label="视图", type="pil",height=400,width=700,buttons=['fullscreen'])
 
                 gr.Markdown("### 处理结果")
                 output_text = gr.Textbox(label="预测结果", lines=6)

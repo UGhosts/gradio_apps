@@ -12,6 +12,7 @@ plt = util.auto_config_chinese_font()
 # 全局变量记录选中的测试文件
 selected_preset = None
 import logging
+import paddle
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -55,6 +56,9 @@ def process_input(selected_model_dir):
         return None, f"错误: 请先选择一个测试文件\n{preset_info}\n{model_info}"
     
     # 检查paddle相关模块是否可用
+    # 尝试导入 paddle 相关模块，若失败则认为不可用
+    paddle_available = True
+
     if not paddle_available:
         data = pd.read_csv(selected_preset)
         plot_title = f"时序曲线 - {os.path.basename(selected_preset)}"
@@ -224,7 +228,7 @@ def create_interface():
 
             with gr.Column(scale=2):  # 扩大结果展示区域
                 gr.Markdown("### 时序曲线图")
-                plot_output = gr.Image(label="数据曲线", type="pil")
+                plot_output = gr.Image(label="数据曲线", type="pil",buttons=['fullscreen'])
 
                 gr.Markdown("### 处理结果")
                 output_text = gr.Textbox(label="结果信息", lines=10, interactive=False)

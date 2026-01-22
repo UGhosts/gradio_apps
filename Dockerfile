@@ -5,17 +5,19 @@ FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH} \
     DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
-    PATH="/root/.local/bin:/root/.cargo/bin:${PATH}" \
-    UV_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
+    PATH="/root/.local/bin:/root/.cargo/bin:${PATH}"
+    # UV_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
 
 # ==============================================================================
 # 阶段 1: 安装系统依赖和 Python
 # ==============================================================================
-RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list && \
-    sed -i 's@http://security.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list && \
-    apt-get update && \
+# 同样注意：Github Actions 环境下使用 aliyun 可能会变慢
+# RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list && \
+#     sed -i 's@http://security.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list && \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \
+        supervisor \
         python3.10 \
         python3.10-dev \
         python3-pip \
@@ -35,7 +37,7 @@ RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# 安装 uv (单独的 RUN 命令)
+# 安装 uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 修复 libcuda.so.1 链接问题
@@ -47,22 +49,22 @@ WORKDIR /app
 # ==============================================================================
 # 阶段 2: 使用 uv 安装 Python 依赖
 # ==============================================================================
-# 复制依赖文件
 COPY requirements.txt ./
 
-# 使用 uv 安装基础依赖(速度比 pip 快很多)
+# 使用 uv 安装基础依赖
 RUN uv pip install --system --no-cache -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu118
 
 # ==============================================================================
 # 阶段 3: 安装 PaddlePaddle 和 PaddleX
 # ==============================================================================
-# 安装 PaddlePaddle
+
+RUN python3 -m pip install --upgrade pip setuptools wheel
+
 RUN uv pip install --system --no-cache paddlepaddle-gpu==3.1.1 \
-    --index-url https://www.paddlepaddle.org.cn/packages/stable/cu126/
+     --extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu126/
 
 RUN uv pip install --system langchain==0.3.27
 
-# 安装 PaddleX
 RUN git clone --depth 1 --branch v3.3.9 https://github.com/PaddlePaddle/PaddleX.git /tmp/PaddleX && \
     cd /tmp/PaddleX && \
     uv pip install --system --no-cache -e ".[base]" && \
@@ -71,7 +73,6 @@ RUN git clone --depth 1 --branch v3.3.9 https://github.com/PaddlePaddle/PaddleX.
     uv run paddlex --install PaddleOCR && \
     uv run paddlex --install PaddleDetection && \
     uv run paddlex --install PaddleSeg && \
-    # 清理不必要的文件
     rm -rf .git .github tests docs examples && \
     cd /app
 
@@ -89,6 +90,5 @@ COPY utils/ ./utils/
 RUN chmod +x /app/shell/start_all_apps.sh /app/shell/start_app.sh
 RUN mkdir -p /app/logs
 
-# 暴露端口并设置默认命令
 EXPOSE 37700-37900
 CMD ["bash", "/app/shell/start_all_apps.sh"]

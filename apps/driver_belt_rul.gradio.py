@@ -884,7 +884,7 @@ def create_gradio_interface():
                     result_summary = gr.Textbox(label="预测概要", lines=6, interactive=False)
                     
                     with gr.Row():
-                        visualization = gr.Image(label="可视化分析", height=600)
+                        visualization = gr.Image(label="可视化分析", height=600,buttons=['fullscreen'])
                     
                     rul_report = gr.Textbox(label="详细分析报告", lines=20, interactive=False)
         
@@ -967,7 +967,7 @@ def create_gradio_interface():
                     sim_result_file = gr.Textbox(label="数据文件路径", interactive=False)
                     sim_result_text = gr.Textbox(label="生成统计", lines=15, interactive=False)
                     
-                    sim_viz_output = gr.Image(label="数据可视化", height=600)
+                    sim_viz_output = gr.Image(label="数据可视化", height=600,buttons=['fullscreen'])
         
         # 模型下拉菜单改变时自动加载
         model_dropdown.change(
