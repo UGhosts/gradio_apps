@@ -1,0 +1,101 @@
+Global:
+  model_name: TimesNet_cls
+Hpi:
+  backend_configs:
+    paddle_infer:
+      trt_dynamic_shapes:
+        features:
+        - - 1
+          - 6
+          - 34
+        - - 1
+          - 6
+          - 34
+        - - 8
+          - 6
+          - 34
+        pad_mask:
+        - - 1
+          - 6
+        - - 1
+          - 6
+        - - 8
+          - 6
+    tensorrt:
+      dynamic_shapes:
+        features:
+        - - 1
+          - 6
+          - 34
+        - - 1
+          - 6
+          - 34
+        - - 8
+          - 6
+          - 34
+        pad_mask:
+        - - 1
+          - 6
+        - - 1
+          - 6
+        - - 8
+          - 6
+ancestor_classname_set:
+- TimesNet_CLS
+- PaddleBaseClassifier
+- BaseClassifier
+- ABC
+- object
+holiday: false
+info_params:
+  freq: 1
+  group_id: group_id
+  target_cols:
+  - jsssz
+  - jssxbjz
+  - jsxxbjz
+  - csssz
+  - cssxbjz
+  - csxxbjz
+  - rqjkwdsdz
+  - rqjkwddqz
+  - rqjkzksdz
+  - rqjkzkdqz
+  - bpdjjbsjsdz
+  - bpdjjbsjdqz
+  - bpdjjbsdsdz
+  - bpdjjbsddqz
+  - bpdjjbdl
+  - bpdjfssjsdz
+  - bpdjfssjdqz
+  - bpdjfssdsdz
+  - bpdjfssddqz
+  - bpdjfsdl
+  - dlz_01
+  - dlz_02
+  - dyz_01
+  - dyz_02
+  - temp
+  - V_rms_x
+  - V_rms_y
+  - V_rms_z
+  - A_rms_x
+  - A_rms_y
+  - A_rms_z
+  - D_rms_x
+  - D_rms_y
+  - D_rms_z
+  time_col: time
+input_data:
+  features:
+  - null
+  - 6
+  - 34
+  pad_mask:
+  - null
+  - 6
+model_type: classification
+modulename: paddlets.models.classify.dl.timesnet
+scale: true
+size: {}
+time_feat: false
