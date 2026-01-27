@@ -34,6 +34,7 @@ declare -a APPS=(
     "duanmo_prd:37715"
     "centrifugal_fault_det:37716"
     "fan_noise_flask:37717"
+    "jiaobanji_prd:37718"
 )
 
 # === 生成 Supervisor 配置文件 ===
