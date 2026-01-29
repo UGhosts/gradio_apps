@@ -5,8 +5,10 @@ import sys
 import os
 import json
 import matplotlib.pyplot as plt
-os.environ.setdefault("PADDLE_DEVICE", "cpu")
-os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
+# 修改：使用GPU进行计算
+os.environ.setdefault("PADDLE_DEVICE", "gpu")
+# 修改：允许使用所有GPU设备（或指定具体GPU，如 "0" 表示使用第0号GPU）
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
 from paddlex import create_model
 import numpy as np
 import pandas as pd
@@ -230,8 +232,8 @@ def process_input(selected_model_dir):
         # Preprocess CSV for inference (rename columns)
         window_paths = preprocess_for_inference(selected_preset, output_dir)
         
-        # Load model and predict
-        model = create_model(model_name="TimesNet_cls", model_dir=selected_model_dir)
+        # 修改：加载模型时指定使用GPU设备
+        model = create_model(model_name="TimesNet_cls", model_dir=selected_model_dir, device="gpu")
         
         # Process results
         # output is a list of dicts or similar structure

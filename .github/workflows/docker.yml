@@ -46,4 +46,4 @@ jobs:
         push: true
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        tags: ${{ secrets.DOCKER_HUB_REGISTER }}/ughost-docker/gradio_apps:v1.0.3
+        tags: ${{ secrets.DOCKER_HUB_REGISTER }}/ughost-docker/gradio_apps:v1.0.3-nv12.9.1-cudnn-devel-ubuntu22.04
